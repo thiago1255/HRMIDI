@@ -1,6 +1,7 @@
 🌐: [Em Português 🇧🇷](README.pt-BR.md)
 # HRMIDI
-Human Readable MIDI, to easily write music to be converted to .mid.
+Human Readable MIDI, to easily write music to be converted to `.mid`.
+
 *If markdown can write formated text, why can't HRMIDI write music ?*
 
 # The language:
@@ -26,6 +27,7 @@ The language have some rules:
 - Lines must be split using `\n` (new line);
 - Empty lines will be ignored, you can use them for formating.
 - Keys/terms can be written in lowercase or uppercase, and even mix both.
+
 **For full technical description check the manual pages.**
 
 # The program:
