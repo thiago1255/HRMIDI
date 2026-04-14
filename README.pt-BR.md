@@ -25,7 +25,9 @@ A linguagem tem algumas regras:
 - Pode-se usar linhas vazias para formatação.
 - Os termos/notas podem ser escritos em caixa alta, baixa ou ambas.
 
-**Para detalhes técnicos completos, verifique o manual.**
+**Para detalhes técnicos completos, verifique o [manual](man/pt_BR/man7/hrmidi.7.md) da linguagem.**
 
 # O programa:
 Por ora, haverá apenas o comando `hrmidi` para compilar, ou para converter para outra linguagem.
+
+Veja o [manual](man/pt_BR/man1/hrmidi.1.md) para mais detalhes.

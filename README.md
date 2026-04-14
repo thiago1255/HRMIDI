@@ -28,7 +28,9 @@ The language have some rules:
 - Empty lines will be ignored, you can use them for formating.
 - Keys/terms can be written in lowercase or uppercase, and even mix both.
 
-**For full technical description check the manual pages.**
+**For full technical description check the [manual pages](man/man7/hrmidi.7.md).**
 
 # The program:
 For now there will be only the `hrmidi` command to compile or convert to another language/type.
+
+Check the [manual](man/man1/hrmidi.1.md) for more details.
