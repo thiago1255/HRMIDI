@@ -40,7 +40,7 @@ Para mais informações sobre a linguagem ver **hrmidi(5)**.
 **-o** *arquivo*
 :	Seleciona o nome do arquivo de saída. (O padrão é o nome de arquivo de entrada, sem extensões, seguido de .mid ou .hrmidi)
 
-**-stdout**
+**--stdout**
 :	Direciona a saída para stdout. Desativa o **-o** em arquivo.
 
 # EXEMPLOS

@@ -1,0 +1,135 @@
+#!/usr/bin/python3
+
+# - - - - - - - imports
+import re
+import sys
+from argparse import ArgumentParser
+
+# - - - - - - - constants
+version: str = "0"
+languages: tuple[str] = ('pt', 'en', 'midi')
+keys_number = {
+}
+keys_fonetic = {
+}
+keys_alphabetic = {
+}
+en_instruments: dict = {
+	'piano': 1
+	,'violin': 41
+}
+pt_instruments: dict = {
+	'piano': 1
+	,'violino': 41
+}
+
+# - - - - - - - output functions
+def print_version():
+	print(f'hrmidi version: {version}')
+	sys.exit(0)
+
+def print_error(text: str):
+	print(f'hrmidi: error: compiler failed with {text} !')
+	sys.exit(1)
+
+def print_warning(text: str) -> None:
+	if stdout: return
+	print(f'hrmidi: warning: {text}')
+
+# - - - - - - - processing functions
+def str_to_number(s: str) -> int | float | str:
+	try:
+		output = int(s)
+	except:
+		try:
+			output = float(s)
+		except:
+			try :
+				output = int(s.split("/")[0]) / int(s.split("/")[1])
+			except:
+				output = s
+	
+	return output
+
+def get_term(lines: dict, term_name: str, optional: bool = False) -> str | None:
+	term_line: str | None = next((line for line in lines.values() if line.startswith(term_name)), None)
+	if not term_line:
+		if optional: return None
+		print_error(f'{term_name} line not found')
+	term: str = re.split(r'[;\s]+', term_line)[-1]
+	if term == term_name or (not term): print_error(f'no {term_name} specified')
+	return term
+
+def parse_hrmidi() -> dict:
+	lines: dict[int:str] = {number:valid for number,line in enumerate(file.split("\n"), start=1) if (valid := line.split("//")[0].strip().lower().replace(",", "."))}
+	
+	lang: str = get_term(lines, "lang")
+	if (lang not in languages) or (lang == "midi"): print_error(f'lang "{lang}" is invalid')
+	
+	bpm = get_term(lines, "bpm")
+	bpm = str_to_number(bpm)
+	if isinstance(bpm,str): print_error(f'invalid bpm number: "{bpm}"')
+	
+	ver = get_term(lines, "ver", optional=True)
+	if ver:
+		if ver != version: print_warning(f'file version is "{ver}", this program version is "{version}"')
+	else:
+		print_warning('no version specified on file')
+	
+	source: list = [bpm]
+	detected = {"lang": False, "bpm": False, "ver": False}
+	step: dict = {"c": False, "n": False, "t": False, "m": False}
+	temp: list = [] 
+	for number, line in lines.items():
+		if line.startswith("lang"):
+			if detected["lang"]:
+				print_error(f"duplicated lang at line {number}")
+			else:
+				detected["lang"] = True; continue
+		if line.startswith("bpm"):
+			if detected["bpm"]:
+				print_error(f"duplicated bpm at line {number}")
+			else:
+				detected["bpm"] = True; continue
+		if line.startswith("ver"):
+			if detected["ver"]:
+				print_error(f"duplicated ver at line {number}")
+			else:
+				detected["ver"] = True; continue
+		
+		if line.startswith("c_"):
+			if step["c"]:
+				pass #check if new clef should begin or raises error
+			step["c"] = True
+			
+		if line.startswith("n_"):
+		if line.startswith("t_"):
+		if line.startswith("m_"):
+		print_error(f"unknow instruction at line {number}")
+
+# - - - - - - - main
+if __name__ == "__main__":
+	parser: ArgumentParser = ArgumentParser(
+		prog="hrmidi"
+		,description="Compiler for hrmidi language."
+	)
+
+	parser.add_argument('-v', '--version', action='store_true', help='Shows program version.')
+	parser.add_argument('-l', metavar='language', default='midi', choices=languages, help='The output language (Default: midi).')
+	parser.add_argument('-f', metavar='format', default=None, help='The formating for non midi output.')
+	parser.add_argument('-o', metavar='output_file', default=None, help='The name of output file.')
+	parser.add_argument('--stdout', action='store_true', help='Outputs to stdout instead file.')
+	parser.add_argument('file', help='Name of the input file.')
+
+	args = parser.parse_args()
+	if args.version: print_version()
+	try:
+		with open(args.file, 'r') as f: file = f.read()
+	except FileNotFoundError:
+		print(f"hrmidi: file '{args.file}' not found.")
+		sys.exit(1)
+	language, hrmidi_format, output, stdout = args.l, args.f, args.o, args.stdout
+	del parser, args
+
+	source: dict = parse_hrmidi()
+	del file

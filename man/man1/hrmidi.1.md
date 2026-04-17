@@ -40,7 +40,7 @@ For more info on the language see **hrmidi(5)**.
 **-o** *file*
 :	Sets the output file name. (The standard is input file name, withowt extensions, followed with .mid or .hrmidi)
 
-**-stdout**
+**--stdout**
 :	Redirects output to stdout. Disables **-o** to file.
 
 # EXAMPLES
