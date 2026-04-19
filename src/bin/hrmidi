@@ -8,19 +8,105 @@ from argparse import ArgumentParser
 # - - - - - - - constants
 version: str = "0"
 languages: tuple[str] = ('pt', 'en', 'midi')
-keys_number = {
+keys = {
+	0:		0
+	,'_':	0
+	,'0':	0
+	
+	,1:		1
+	,'do':	1
+	,'c':	1
+	,'1':	1
+	
+	,2:		2
+	,'do#':	2
+	,'reb': 2
+	,'c#':	2
+	,'db':	2
+	,'1#':	2
+	,'2b':	2
+	
+	,3:		3
+	,'re':	3
+	,'d':	3
+	,'2':	3
+	
+	,4:		4
+	,'re#':	4
+	,'mib':	4
+	,'d#':	4
+	,'eb':	4
+	,'2#':	4
+	,'3b':	4
+	
+	,5:		5
+	,'mi':	5
+	,'e':	5
+	,'3':	5
+	
+	,6:		6
+	,'fa':	6
+	,'f':	6
+	,'4':	6
+	
+	,7:		7
+	,'fa#':	7
+	,'solb':7
+	,'f#':	7
+	,'gb':	7
+	,'4#':	7
+	,'5b':	7
+	
+	,8:		8
+	,'sol':	8
+	,'g':	8
+	,'5':	8
+	
+	,9:		9
+	,'sol#':9
+	,'lab':	9
+	,'g#':	9
+	,'ab':	9
+	,'5#':	9
+	,'6b':	9
+	
+	,10:	10
+	,'la':	10
+	,'a':	10
+	,'6':	10
+	
+	,11:	11
+	,'la#':	11
+	,'sib':	11
+	,'a#':	11
+	,'bb':	11
+	,'6#':	11
+	,'7b':	11
+	
+	,12:	12
+	,'si':	12
+	,'b':	12
+	,'h':	12
+	,'7':	12
 }
-keys_fonetic = {
+en_clefs = {
+	'bass':		-1
+	,'treble':	0
+	,'alto':	1
+	,'tenor':	1
 }
-keys_alphabetic = {
+pt_clefs = {
+	'fa':	-1
+	,'sol':	0
+	,'do':	1
 }
 en_instruments: dict = {
-	'piano': 1
-	,'violin': 41
+	'piano':	1
+	,'violin':	41
 }
 pt_instruments: dict = {
-	'piano': 1
-	,'violino': 41
+	'piano':	1
+	,'violino':	41
 }
 
 # - - - - - - - output functions
@@ -64,7 +150,16 @@ def parse_hrmidi() -> dict:
 	lines: dict[int:str] = {number:valid for number,line in enumerate(file.split("\n"), start=1) if (valid := line.split("//")[0].strip().lower().replace(",", "."))}
 	
 	lang: str = get_term(lines, "lang")
-	if (lang not in languages) or (lang == "midi"): print_error(f'lang "{lang}" is invalid')
+	match lang:
+		case "en":
+			instruments = en_instruments
+			clefs = en_clefs
+		case "pt":
+			instruments = pt_instruments
+			clefs = pt_instruments
+		case _:
+			print_error(f'lang "{lang}" is invalid')
+	del lang
 	
 	bpm = get_term(lines, "bpm")
 	bpm = str_to_number(bpm)
@@ -79,7 +174,7 @@ def parse_hrmidi() -> dict:
 	source: list = [bpm]
 	detected = {"lang": False, "bpm": False, "ver": False}
 	step: dict = {"c": False, "n": False, "t": False, "m": False}
-	temp: list = [] 
+	temp: dict = {}
 	for number, line in lines.items():
 		if line.startswith("lang"):
 			if detected["lang"]:
@@ -99,13 +194,73 @@ def parse_hrmidi() -> dict:
 		
 		if line.startswith("c_"):
 			if step["c"]:
-				pass #check if new clef should begin or raises error
+				if step["n"]:
+					if step["t"]:
+						if len(temp['keys']) != len(temp['times']): print_error(f"track above line {number} have different number of keys and times")
+						source.append(temp)
+						step: dict = {"c": False, "n": False, "t": False, "m": False}
+					else:
+						print_error(f"new track started at line {number} withowt finish the previous (missing time section)")
+				else:
+					print_error(f"new track started at line {number} withowt finish the previous (missing at least keys section)")
 			step["c"] = True
-			
+			items = re.split(r'[;\s]+', line)
+			if len(items) != 2: print_error(f"invalid arguments number at line {number} (must be two)")
+			instrument: str = items[0].replace('c_', '')
+			if instrument not in instruments.keys(): print_error(f"invalid instrument name at line {number}")
+			clef = str_to_number(items[1])
+			if not isinstance(clef, int):
+				if clef not in clefs.keys(): print_error(f"invalid clef name at line {number}")
+				clef = clefs[clef]
+			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "keys": [], "shift": [], "time": []}
+			continue
 		if line.startswith("n_"):
+			if not step["c"]: print_error(f"line {number} does not have clef declaration above")
+			if step["n"]: print_error(f"duplicate and/or invalid keys section at line {number}")
+			items = re.split(r'[;\s]+', line)
+			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
+			instrument: str = items[0].replace('n_', '')
+			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
+			for key in items[1:]:
+				temp["shift"].append(key.count('+') - key.count('-'))
+				key = key.replace('-', '').replace('+', '')
+				if key not in keys.keys(): print_error(f"invalid key '{key}' at line {number}")
+				temp["keys"].append(keys[key])
+			step["n"] = True
+			continue
 		if line.startswith("t_"):
+			if not step["c"]: print_error(f"line {number} does not have clef declaration above")
+			if step["t"]: print_error(f"duplicate and/or invalid time section at line {number}")
+			items = re.split(r'[;\s]+', line)
+			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
+			instrument: str = items[0].replace('t_', '')
+			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
+			for time in items[1:]:
+				time = str_to_number(time)
+				if isinstance(time, str): print_error(f"invalid time '{time}' at line {number}")
+				temp["time"].append(time)
+			step["t"] = True
+			continue
 		if line.startswith("m_"):
+			if not step["c"]: print_error(f"line {number} does not have clef declaration above")
+			if step["m"]: print_error(f"duplicate and/or invalid modifier at line {number}")
+			items = re.split(r'[;\s]+', line)
+			if len(items) != 2: print_error(f"invalid arguments number at line {number} (must be two)")
+			instrument: str = items[0].replace('m_', '')
+			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
+			modifier = str_to_number(items[1])
+			if isinstance(modifier, str): print_error(f"modifier at line {number} must be a valid number or fraction")
+			temp["modifier"] = modifier
+			step["m"] = True
+			continue
 		print_error(f"unknow instruction at line {number}")
+	
+	if not step["c"]: print_error(f"no tracks found")
+	if not step["n"]: print_error(f"last track missing at least keys section")
+	if not step["t"]: print_error(f"last track missing time section")
+	if len(temp['keys']) != len(temp['times']): print_error(f"last track have different number of keys and times")
+	source.append(temp)
+	return source
 
 # - - - - - - - main
 if __name__ == "__main__":
