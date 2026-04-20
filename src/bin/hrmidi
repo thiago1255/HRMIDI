@@ -156,7 +156,7 @@ def parse_hrmidi() -> dict:
 			clefs = en_clefs
 		case "pt":
 			instruments = pt_instruments
-			clefs = pt_instruments
+			clefs = pt_clefs
 		case _:
 			print_error(f'lang "{lang}" is invalid')
 	del lang
@@ -197,6 +197,7 @@ def parse_hrmidi() -> dict:
 				if step["n"]:
 					if step["t"]:
 						if len(temp['keys']) != len(temp['times']): print_error(f"track above line {number} have different number of keys and times")
+						temp["instrument"] = instruments[temp["instrument"]]
 						source.append(temp)
 						step: dict = {"c": False, "n": False, "t": False, "m": False}
 					else:
@@ -212,7 +213,7 @@ def parse_hrmidi() -> dict:
 			if not isinstance(clef, int):
 				if clef not in clefs.keys(): print_error(f"invalid clef name at line {number}")
 				clef = clefs[clef]
-			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "keys": [], "shift": [], "time": []}
+			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "keys": [], "shift": [], "times": []}
 			continue
 		if line.startswith("n_"):
 			if not step["c"]: print_error(f"line {number} does not have clef declaration above")
@@ -238,7 +239,7 @@ def parse_hrmidi() -> dict:
 			for time in items[1:]:
 				time = str_to_number(time)
 				if isinstance(time, str): print_error(f"invalid time '{time}' at line {number}")
-				temp["time"].append(time)
+				temp["times"].append(time)
 			step["t"] = True
 			continue
 		if line.startswith("m_"):
@@ -259,6 +260,7 @@ def parse_hrmidi() -> dict:
 	if not step["n"]: print_error(f"last track missing at least keys section")
 	if not step["t"]: print_error(f"last track missing time section")
 	if len(temp['keys']) != len(temp['times']): print_error(f"last track have different number of keys and times")
+	temp["instrument"] = instruments[temp["instrument"]]
 	source.append(temp)
 	return source
 
@@ -288,3 +290,4 @@ if __name__ == "__main__":
 
 	source: dict = parse_hrmidi()
 	del file
+	print(source)

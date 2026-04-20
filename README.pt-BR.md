@@ -7,7 +7,7 @@ No cabeçalho de cada música definem-se alguns detalhes essenciais:
 BPM 100 // A velocidade da música
 LANG pt // Em qual linguagem humana estarão os nomes dos instrumentos e claves
 ```
-The instruments can be declared like that:
+As trilhas podem ser declaras assim:
 ```
 C_PIANO sol					// A clave usada nessa trilha
 N_PIANO do re mi fa _ sol	// As notas e silêncios da trilha
