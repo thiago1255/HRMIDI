@@ -92,8 +92,8 @@ keys = {
 en_clefs = {
 	'bass':		-1
 	,'treble':	0
-	,'alto':	1
 	,'tenor':	1
+	,'alto':	1
 }
 pt_clefs = {
 	'fa':	-1
@@ -107,6 +107,49 @@ en_instruments: dict = {
 pt_instruments: dict = {
 	'piano':	1
 	,'violino':	41
+}
+
+keys_numeric: dict = {
+	1:		"1"
+	,2:		"1#"
+	,3:		"2"
+	,4:		"2#"
+	,5:		"3"
+	,6:		"4"
+	,7:		"4#"
+	,8:		"5"
+	,9:		"5#"
+	,10:	"6"
+	,11:	"6#"
+	,12:	"7"
+}
+keys_phonetic: dict = {
+	1:		"Do"
+	,2:		"Do#"
+	,3:		"Re"
+	,4:		"Re#"
+	,5:		"Mi"
+	,6:		"Fa"
+	,7:		"Fa#"
+	,8:		"Sol"
+	,9:		"Sol#"
+	,10:	"La"
+	,11:	"La#"
+	,12:	"Si"
+}
+keys_alpha: dict = {
+	1:		"C"
+	,2:		"C#"
+	,3:		"D"
+	,4:		"D#"
+	,5:		"E"
+	,6:		"F"
+	,7:		"F#"
+	,8:		"G"
+	,9:		"G#"
+	,10:	"A"
+	,11:	"A#"
+	,12:	"B"
 }
 
 # - - - - - - - output functions
@@ -251,6 +294,7 @@ def parse_hrmidi() -> dict:
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			modifier = str_to_number(items[1])
 			if isinstance(modifier, str): print_error(f"modifier at line {number} must be a valid number or fraction")
+			if modifier == 0: print_error(f"modifier at line {number} cannot be zero")
 			temp["modifier"] = modifier
 			step["m"] = True
 			continue
@@ -263,6 +307,69 @@ def parse_hrmidi() -> dict:
 	temp["instrument"] = instruments[temp["instrument"]]
 	source.append(temp)
 	return source
+
+def make_midi():
+	pass
+
+def make_hr() -> str:
+	result: str = "LANG {language}\nBPM {source[0]}\n\n"
+
+	if 'a' in hrmidi_format:
+		keys_dict: dict = keys_alpha.copy()
+	elif 'f' in hrmidi_format:
+		keys_dict: dict = keys_phonetic.copy()
+	else:
+		keys_dict: dict = keys_numeric.copy()
+
+	if '_' in hrmidi_format:
+		keys_dict[0] = "_" 
+	else:
+		keys_dict[0] = "0"
+
+	instruments_dict: dict = {}
+	clefs_dict: dict = {}
+	match language:
+		case 'en':
+			for i, n in en_instruments.items():
+				instruments_dict[n] = i
+			if 'm' in hrmidi_format:
+				clefs_dict = {n:str(n) for n in range(1, 13)}
+			else:
+				for i, n in en_clefs.items():
+					clefs_dict[n] = i
+		case 'pt':
+			for i, n in pt_instruments.items():
+				instruments_dict[n] = i
+			if 'm' in hrmidi_format:
+				clefs_dict = {n:str(n) for n in range(1, 13)}
+			else:
+				for i, n in pt_clefs.items():
+					clefs_dict[n] = i
+
+	convert_modifier: bool = ('c' in hrmidi_format)
+
+	for track in source[1:]:
+		instrument: str = instruments_dict[track["instrument"]].upper()
+		modifier = track['modifier']
+		result += f"C_{instrument} {clefs_dict[track['clef']]}\nN_{instrument} "
+		for key, shift in zip(track['keys'], track['shift']):
+			if shift < 0:
+				result += (-shift * "-")
+			elif shift > 0:
+				result += (shift * "+")
+			result += keys_dict[key]
+			result += " 	"
+		result += "\nT_{instrument} "
+		for time in track['times']:
+			if convert_modifier:
+				time = (time / modifier)
+			result += str(time)
+			result += " 	"
+		if not convert_modifier:
+			result += "\nM_{instrument} {modifier}"
+		result += "\n\n"
+
+	return result
 
 # - - - - - - - main
 if __name__ == "__main__":
@@ -286,8 +393,19 @@ if __name__ == "__main__":
 		print(f"hrmidi: file '{args.file}' not found.")
 		sys.exit(1)
 	language, hrmidi_format, output, stdout = args.l, args.f, args.o, args.stdout
+	if not output: output = os.path.splitext(os.path.basename(args.file))[0]
 	del parser, args
 
 	source: dict = parse_hrmidi()
 	del file
-	print(source)
+	if language == 'midi':
+		output += ".mid"
+		result: str = make_midi()
+	else:
+		output += (language + ".hrmidi")
+		result: str = make_hr()
+
+	if stdout:
+		print(result)
+	else:
+		with open(output, 'w') as f: f.write(result) 

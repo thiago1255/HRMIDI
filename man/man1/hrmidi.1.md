@@ -29,7 +29,7 @@ For more info on the language see **hrmidi(5)**.
 **-f** *format options*
 :	Only if **-l**  is set for a option that is not *midi*:
 	
-	Keys format: n (numeric) f (fonetic) a (alfabetic). Default: n
+	Keys format: n (numeric) f (phonetic) a (alfabetic). Default: n
 	
 	Breaks format: 0 (numeric) _ (underline). Default: 0
 	
@@ -38,7 +38,7 @@ For more info on the language see **hrmidi(5)**.
 	Time modifiers: k (keep modifiers) c (converts the times). Default: k
 
 **-o** *file*
-:	Sets the output file name. (The standard is input file name, withowt extensions, followed with .mid or .hrmidi)
+:	Sets the output file name. (The standard is input file name, withowt extensions, followed with .mid or .*language*.hrmidi)
 
 **--stdout**
 :	Redirects output to stdout. Disables **-o** to file.

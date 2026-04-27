@@ -38,7 +38,7 @@ Para mais informações sobre a linguagem ver **hrmidi(5)**.
 	Modificadores de tempo: k (Mantém os modificadores) c (Converte os tempos). Padrão: k
 
 **-o** *arquivo*
-:	Seleciona o nome do arquivo de saída. (O padrão é o nome de arquivo de entrada, sem extensões, seguido de .mid ou .hrmidi)
+:	Seleciona o nome do arquivo de saída. (O padrão é o nome de arquivo de entrada, sem extensões, seguido de .mid ou .*lingua*.hrmidi)
 
 **--stdout**
 :	Direciona a saída para stdout. Desativa o **-o** em arquivo.
