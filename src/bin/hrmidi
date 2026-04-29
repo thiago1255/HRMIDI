@@ -166,30 +166,29 @@ def print_warning(text: str) -> None:
 	print(f'hrmidi: warning: {text}')
 
 # - - - - - - - processing functions
-def str_to_number(s: str) -> int | float | str:
-	try:
-		output = int(s)
-	except:
-		try:
-			output = float(s)
-		except:
-			try :
-				output = int(s.split("/")[0]) / int(s.split("/")[1])
-			except:
-				output = s
-	
-	return output
-
-def get_term(lines: dict, term_name: str, optional: bool = False) -> str | None:
-	term_line: str | None = next((line for line in lines.values() if line.startswith(term_name)), None)
-	if not term_line:
-		if optional: return None
-		print_error(f'{term_name} line not found')
-	term: str = re.split(r'[;\s]+', term_line)[-1]
-	if term == term_name or (not term): print_error(f'no {term_name} specified')
-	return term
-
 def parse_hrmidi() -> dict:
+	def str_to_number(s: str) -> int | float | str:
+		try:
+			output = int(s)
+		except:
+			try:
+				output = float(s)
+			except:
+				try :
+					output = int(s.split("/")[0]) / int(s.split("/")[1])
+				except:
+					output = s
+		return output
+
+	def get_term(lines: dict, term_name: str, optional: bool = False) -> str | None:
+		term_line: str | None = next((line for line in lines.values() if line.startswith(term_name)), None)
+		if not term_line:
+			if optional: return None
+			print_error(f'{term_name} line not found')
+		term: str = re.split(r'[;\s]+', term_line)[-1]
+		if term == term_name or (not term): print_error(f'no {term_name} specified')
+		return term
+
 	lines: dict[int:str] = {number:valid for number,line in enumerate(file.split("\n"), start=1) if (valid := line.split("//")[0].strip().lower().replace(",", "."))}
 	
 	lang: str = get_term(lines, "lang")
@@ -308,8 +307,66 @@ def parse_hrmidi() -> dict:
 	source.append(temp)
 	return source
 
-def make_midi():
-	pass
+def make_midi() -> bytes:
+	def vlq(i:int) -> bytes:
+		o:list = [i & 0x7F]
+		i >>= 7
+		while i:
+			o.append((i & 0x7F)|0x80)
+			i >>= 7
+		return bytes(reversed(o))
+
+	def mtrk(i:list[bytes]) -> bytes:
+		o:bytes = b"".join(i)
+		o += vlq(0)
+		o += bytes([0xFF, 0x2F, 0x00]) # End of Track
+		return b"MTrk" + len(o).to_bytes(4, 'big') + o
+
+	result: bytearray = bytearray()
+
+	result += b"MThd"							# Header begin
+	result += (6).to_bytes(4, 'big')			# Header standard size
+	result += (1).to_bytes(2, 'big')			# Midi format, there is 0, 1 and 2
+	result += (len(source)).to_bytes(2, 'big')	# How many track chunks
+	result += (960).to_bytes(2, 'big')			# Some timing stuff
+
+	result += mtrk([
+		vlq(0)																	# Deltatime
+		,bytes([0xFF, 0x58, 0x04, 0x04, 0x02, 0x18, 0x08])						# Time Signature
+		,vlq(0)																	# Deltatime
+		,bytes([0xFF, 0x51, 0x03]) + (60000000 // source[0]).to_bytes(3, 'big')	# Set Tempo
+	)]
+
+	for channel, track in enumerate(source[1:]):
+		chunk: list[bytes] = [
+			vlq(0)
+			,bytes([0xC0 | channel])
+			,bytes(track['instrument'])
+		]
+
+		delay: int = 0
+		for k, s, t in zip(track['keys'], track['shift'], track['times']):
+			t = int(t * 960 / track['modifier'])
+			if k != 0:
+				k -= 1 # In midi they start at 0, not 1
+				k += ((track['clef'] + 5) * 12) # Sets the clef
+				k += (s * 12) # Shift the clef
+				chunk += [
+					vlq(delay)				# When the note will start, after previous event
+					,bytes([0x90 | channel])	# Note On Event
+					,bytes(k)				# Note Value
+					,bytes(63)				# "velocity" - in pratice the volume
+					,vlq(t)				# When the note will end
+					,bytes([0x80 | channel])	# Note Off Event
+					,bytes(k)				# Note Value
+					,bytes(0)				# "velocity" - some instruments may act diferent with non 0
+				]
+				delay = 0
+			else:
+				delay += t
+		result += mtrk(chunk)
+
+	return bytes(result)
 
 def make_hr() -> str:
 	result: str = "LANG {language}\nBPM {source[0]}\n\n"
@@ -400,12 +457,15 @@ if __name__ == "__main__":
 	del file
 	if language == 'midi':
 		output += ".mid"
-		result: str = make_midi()
+		result: bytes = make_midi()
+		if stdout:
+			sys.stdout.buffer.write(result)
+		else:
+			with open(output, 'wb') as f: f.write(result) 
 	else:
 		output += (language + ".hrmidi")
 		result: str = make_hr()
-
-	if stdout:
-		print(result)
-	else:
-		with open(output, 'w') as f: f.write(result) 
+		if stdout:
+			print(result)
+		else:
+			with open(output, 'w') as f: f.write(result) 
