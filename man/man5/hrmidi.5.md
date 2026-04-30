@@ -72,6 +72,6 @@ The currently implemented instruments are: piano, violino.
 **M** *number* [Optional]
 :	Time modifier for the track, each duration is divided by this number.
 
-# SEE ALSO:
+# SEE ALSO
 
 **hrmidi(1)** - compiler for the hrmidi language.

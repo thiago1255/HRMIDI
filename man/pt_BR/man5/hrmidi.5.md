@@ -72,6 +72,6 @@ Por ora os instrumentos disponíveis são: piano, violino.
 **M** *número* [Opcional]
 :	Modificador do tempo, multiplica-se a velocidade pelo número aqui declarado. Ex: Mudar para "2" vai fazer os tempos "1" virarem "0,5".
 
-# VER TAMBÉM:
+# VER TAMBÉM
 
 **hrmidi(1)** - compilador da linguagem hrmidi.
