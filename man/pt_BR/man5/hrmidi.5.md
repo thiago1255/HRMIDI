@@ -60,7 +60,7 @@ Por ora os instrumentos disponíveis são: piano, violino.
 	
 	Notas podem ser escritas numericamente, foneticamente ou alfabeticamente: do = 1 = C, re = 2 = D, mi = 3 = E, fa = 4 = F, sol = 5 = G, la = 6 = A, si = 7 = B = H.
 	
-	Para definir sustenido ou bemol, deve-se usar `#` ou `b` respectivamente após a nota, sem separação.
+	Para definir sustenido ou bemol, deve-se usar `#` ou `b` (ou os simbolos especiais `♯` ou `♭`) respectivamente após a nota, sem separação.
 	
 	Para escrever a nota uma clave acima ou abaixo, usa-se `+` ou `-` (podendo ser cumulativo) respectivamente antes da nota, sem separação.
 

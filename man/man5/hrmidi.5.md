@@ -60,7 +60,7 @@ The currently implemented instruments are: piano, violino.
 	
 	Keys can be written phonetically, numerically or alphabetically: do = 1 = C, re = 2 = D, mi = 3 = E, fa = 4 = F, sol = 5 = G, la = 6 = A, si = 7 = B = H.
 	
-	To set sharp or flat, must use `#` or `b` after the key, without split.
+	To set sharp or flat, must use `#` or `b` (or use the special symbols `♯` or `♭`) after the key, without split.
 	
 	To write the key one clef above or below, must use `+` or `-` (being cumulative) before the key, without split.
 
