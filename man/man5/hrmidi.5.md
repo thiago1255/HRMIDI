@@ -27,7 +27,7 @@ Used to write music to be converted to MIDI, requires two sections **Head** and 
 
 # HEAD
 
-Sets global settings for the entire file.
+Lines that sets global settings for the entire file, can be placed anywhere on the file.
 
 **BPM** *decimal_or_integer_number* (Mandatory)
 :	Sets the beats per minute of the music.
@@ -39,6 +39,9 @@ Sets global settings for the entire file.
 
 **VER** *version* [Optional]
 :	Sets the version of the language, may have uses in the future for compatibility.
+
+**DODECA** [Optional]
+:	Enables the dodecaphonic mode for tracks below it.
 
 # TRACK
 
@@ -63,6 +66,8 @@ The currently implemented instruments are: piano, violino.
 	To set sharp or flat, must use `#` or `b` (or use the special symbols `♯` or `♭`) after the key, without split.
 	
 	To write the key one clef above or below, must use `+` or `-` (being cumulative) before the key, without split.
+	
+	With dodecaphonic mode enabled, numbers notes will be read from 1-12, an attemp to write sharp/flat on a number will result in being read as the "numeric" (non dodecaphonic) mode previously cited.
 
 **T** *time* (Mandatory)
 :	Sets the duration of each key or break from the keys line - how many beats. Must have the same amount of items as the keys line.

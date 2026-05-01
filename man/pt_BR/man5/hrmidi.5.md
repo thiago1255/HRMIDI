@@ -27,7 +27,7 @@ Usada para escrever música para ser convertida para MIDI, requer duas seções:
 
 # CABEÇALHO
 
-Define elementos universais para o resto do arquivo.
+Linhas que definem elementos universais para todo o arquivo, podem ser escritos em qualquer parte.
 
 **BPM** *número_decimal_ou_inteiro* (Obrigatório)
 :	Define os batimentos por minuto da música.
@@ -39,6 +39,9 @@ Define elementos universais para o resto do arquivo.
 
 **VER** *versão* [Opcional]
 :	Define a versão da linguagem, poderá ter usos futuros por motivos de compatibilidade.
+
+*DODECA** [Opcional]
+:	Ativa o modo dodecafonico para trilhas abaixo.
 
 # TRILHA
 
@@ -63,6 +66,8 @@ Por ora os instrumentos disponíveis são: piano, violino.
 	Para definir sustenido ou bemol, deve-se usar `#` ou `b` (ou os simbolos especiais `♯` ou `♭`) respectivamente após a nota, sem separação.
 	
 	Para escrever a nota uma clave acima ou abaixo, usa-se `+` ou `-` (podendo ser cumulativo) respectivamente antes da nota, sem separação.
+	
+	Com o modo dodecafonico ligado, as notas númericas serão lidas de 1-12, escrever números com sustenido/bemol resultará em eles serem interpretados no modo númerico citado anteriormente (não dodecafonico).
 
 **T** *tempo* (Obrigatório)
 :	Define o tempo de cada nota ou pausa da linha das notas - quantas batidas ela vale. Deve ter a mesma quantidade de itens que a linha de notas.

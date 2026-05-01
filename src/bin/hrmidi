@@ -250,25 +250,30 @@ def parse_hrmidi() -> list:
 		print_warning('no version specified on file')
 	
 	source: list = [bpm]
-	detected = {"lang": False, "bpm": False, "ver": False}
+	detected_lang: bool = False; detected_bpm: bool = False; detected_ver: bool = False; detected_dodeca = False
 	step: dict = {"c": False, "n": False, "t": False, "m": False}
 	temp: dict = {}
 	for number, line in lines.items():
 		if line.startswith("lang"):
-			if detected["lang"]:
+			if detected_lang:
 				print_error(f"duplicated lang at line {number}")
 			else:
-				detected["lang"] = True; continue
+				detected_lang = True; continue
 		if line.startswith("bpm"):
-			if detected["bpm"]:
+			if detected_bpm:
 				print_error(f"duplicated bpm at line {number}")
 			else:
-				detected["bpm"] = True; continue
+				detected_bpm = True; continue
 		if line.startswith("ver"):
-			if detected["ver"]:
+			if detected_ver:
 				print_error(f"duplicated ver at line {number}")
 			else:
-				detected["ver"] = True; continue
+				detected_ver = True; continue
+		if line.startswith("dodeca"):
+			if detected_dodeca:
+				print_error(f"duplicated dodeca at line {number}")
+			else:
+				detected_dodeca = True; continue
 		
 		if line.startswith("c_"):
 			if step["c"]:
@@ -303,6 +308,7 @@ def parse_hrmidi() -> list:
 			for key in items[1:]:
 				temp["shift"].append(key.count('+') - key.count('-'))
 				key = key.replace('-', '').replace('+', '')
+				if detected_dodeca: key = str_to_number(key)
 				if key not in keys.keys(): print_error(f"invalid key '{key}' at line {number}")
 				temp["keys"].append(keys[key])
 			step["n"] = True
@@ -388,14 +394,14 @@ def make_midi() -> bytes:
 				k += ((track['clef'] + 5) * 12) # Sets the clef
 				k += (s * 12) # Shift the clef
 				chunk += [
-					vlq(delay)				# When the note will start, after previous event
+					vlq(delay)					# When the note will start, after previous event
 					,bytes([0x90 | channel])	# Note On Event
-					,bytes([k])				# Note Value
+					,bytes([k])					# Note Value
 					,bytes([63])				# "velocity" - in pratice the volume
-					,vlq(t)				# When the note will end
+					,vlq(t)						# When the note will end
 					,bytes([0x80 | channel])	# Note Off Event
-					,bytes([k])				# Note Value
-					,bytes([0])				# "velocity" - some instruments may act diferent with non 0
+					,bytes([k])					# Note Value
+					,bytes([0])					# "velocity" - some instruments may act diferent with non 0
 				]
 				delay = 0
 			else:
