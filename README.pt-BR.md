@@ -34,3 +34,6 @@ Não requer instalação ou compilação, o script em `src/bin/hrmidi` pode ser 
 Para instalar as *páginas do man* rode `convert-man-pages.sh`.
 
 Veja o [manual](man/pt_BR/man1/hrmidi.1.md) para mais detalhes.
+
+# Planos futuros:
+Verifique a [versão em inglês desse documento](README.md).

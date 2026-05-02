@@ -37,3 +37,17 @@ There is no need to install or compile, you can simply run the script `src/bin/h
 In order to install the *man pages*, run the script `convert-man-pages.sh` before.
 
 Check the [manual](man/man1/hrmidi.1.md) for more details.
+
+# Todo:
+### Version 1:
+- Add alternative ways to write notes (sharp and flat when normal notes could be used)
+- Add checks for clefs and notes limits
+- Add limit of 14 instruments, merge channels with same instrument
+- Add all instruments (+ a new way to write for percussion)
+### Version 2:
+- Add support for pages (when one end, the other begins)
+- Avoid floating point (+ add constant for ticks)
+### Version 3:
+- Simultaneous notes with `(note note ...)`
+- Allow to write many `N_` and `T_` at same tracks (make all `N_` follow the `T_` below ?)
+- Maybe alternatiev syntaxes with `[Note,Beats]`
