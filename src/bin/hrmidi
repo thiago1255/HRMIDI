@@ -137,8 +137,150 @@ pt_clefs = {
 	,'do':	1
 }
 en_instruments: dict = {
-	'piano':	1
-	,'violin':	41
+	# Pianos
+	'piano':					1
+	,'piano-bright':			2
+	,'piano-eletric-acoustic':	3
+	,'piano-honky-tonk':		4
+	,'piano-electric-rhodes':	5
+	,'piano-electric-chorused':	6
+	,'harpsichord':				7
+	,'clavinet':				8
+	# Chromatic Percussions
+	,'celesta':					9
+	,'glockenspiel':			10
+	,'music-box':				11
+	,'vibraphone':				12
+	,'marimba':					13
+	,'xylophone':				14
+	,'tubular-bells':			15
+	,'dulcimer':				16
+	# Organs
+	,'organ-drawbar':			17
+	,'organ-percussive':		18
+	,'organ-rock':				19
+	,'organ-church':			20
+	,'organ-reed':				21
+	,'accordion':				22
+	,'harmonica':				23
+	,'accordion-tango':			24
+	# Guitar
+	,'guitar-nylon':			25
+	,'guitar-steel':			26
+	,'guitar-electric-jazz':	27
+	,'guitar-electric-clean':	28
+	,'guitar-electric-muted':	29
+	,'guitar-overdriven':		30
+	,'guitar-distortion':		31
+	,'guitar-harmonics':		32
+	# Bass
+	,'bass':					33
+	,'bass-electric-finger':	34
+	,'bass-electric-pick':		35
+	,'bass-fretless':			36
+	,'bass-slap-1':				37
+	,'bass-slap-2':				38
+	,'bass-synth-1':			39
+	,'bass-synth-2':			40
+	# Strings
+	,'violin':					41
+	,'viola':					42
+	,'cello':					43
+	,'contrabass':				44
+	,'strings-tremolo':			45
+	,'strings-pizzicato':		46
+	,'orchestral-harp':			47
+	,'timpani':					48 # String ???
+	# Ensemble
+	,'strings-ensemble':		49
+	,'strings-ensemble-slow':	50
+	,'strings-synth-1':			51
+	,'strings-synth-2':			52
+	,'choir-ah':				53
+	,'voice-oh':				54
+	,'voice-synth':				55
+	,'orchestra-hit':			56
+	# Brass
+	,'trumpet':					57
+	,'trombone':				58
+	,'tuba':					59
+	,'trumpet-muted':			60
+	,'french-horn':				61
+	,'brass-section':			62
+	,'brass-synth-1':			63
+	,'brass-synth-2':			64
+	# Reeds
+	,'sax-soprano':				65
+	,'sax-alto':				66
+	,'sax-tenor':				67
+	,'sax-baritone':			68
+	,'oboe':					69
+	,'english-horn':			70
+	,'bassoon':					71
+	,'clarinet':				72
+	# Pipes
+	,'piccolo':					73
+	,'flute':					74
+	,'recorder':				75
+	,'flute-pan':				76
+	,'blown-bottle':			77
+	,'shakuhachi':				78
+	,'whistle':					79
+	,'ocarina':					80
+	# Synth lead
+	,'lead-square':				81
+	,'lead-sawtooth':			82
+	,'lead-calliope':			83
+	,'lead-chiff':				84
+	,'lead-charang':			85
+	,'lead-voice':				86
+	,'lead-fifths':				87
+	,'lead-bass':				88
+	# Synth pad
+	,'pad-new-age':				89
+	,'pad-warm':				90
+	,'pad-polysynth':			91
+	,'pad-choir':				92
+	,'pad-bowed':				93
+	,'pad-metallic':			94
+	,'pad-halo':				95
+	,'pad-sweep':				96
+	# FX
+	,'fx-rain':					97
+	,'fx-soundtrack':			98
+	,'fx-crystal':				99
+	,'fx-atmosphere':			100
+	,'fx-brightness':			101
+	,'fx-goblins':				102
+	,'fx-echoes':				103
+	,'fx-sci-fi':				104
+	# Ethnic
+	,'sitar':					105
+	,'banjo':					106
+	,'shamisen':				107
+	,'koto':					108
+	,'kalimba':					109
+	,'bag-pipe':				110
+	,'fiddle':					111
+	,'shanai':					112
+	# Percussive
+	,'bell-tinkle':				113
+	,'agogo':					114
+	,'drum-steel':				115
+	,'woodblock':				116
+	,'drum-taiko':				117
+	,'drum-tom':				118
+	,'drum-synth':				119
+	,'cymbal-reverse':			120
+	# Sound effects
+	,'guitar-fret':				121
+	,'breath':					122
+	,'seashore':				123
+	,'bird':					124
+	,'telephone':				125
+	,'helicopter':				126
+	,'applause':				127
+	,'gunshot':					128
 }
 pt_instruments: dict = {
 	'piano':	1
@@ -383,7 +525,7 @@ def make_midi() -> bytes:
 		chunk: list[bytes] = [
 			vlq(0)
 			,bytes([0xC0 | channel])
-			,bytes([track['instrument']])
+			,bytes([track['instrument'] - 1])
 		]
 
 		delay: int = 0
