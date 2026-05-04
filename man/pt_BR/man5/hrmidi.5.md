@@ -52,7 +52,7 @@ Os termos são escritos com a letra + underline + nome do instrumento, ex: `C_VI
 **C** *clave* (Obrigatório)
 :	Define a clave da trilha. Pode ser escrita com número inteiro ou em forma de texto:
 	
-	Claves disponíveis: Fa = -1, Sol = 0, Do = 1. Outros números inteiros podem usados além desses. 
+	Claves disponíveis: Fa = -1, Sol = 0, Do = 1. Outros números inteiros podem usados além desses, o limite vai de -5 a 5.
 
 **N** *notas* (Obrigatório)
 :	Define cada nota e pausa da trilha, cada uma deve ser separada seguindo a *formatação* descrita na seção **DESCRIÇÃO**.
@@ -66,6 +66,8 @@ Os termos são escritos com a letra + underline + nome do instrumento, ex: `C_VI
 	Para escrever a nota uma clave acima ou abaixo, usa-se `+` ou `-` (podendo ser cumulativo) respectivamente antes da nota, sem separação.
 	
 	Com o modo dodecafonico ligado, as notas númericas serão lidas de 1-12, escrever números com sustenido/bemol resultará em eles serem interpretados no modo númerico citado anteriormente (não dodecafonico).
+	
+	O limite das notas é de 0 até 127, ou seja, de "Dó na clave -5" até "Sol na clave 5".
 
 **T** *tempo* (Obrigatório)
 :	Define o tempo de cada nota ou pausa da linha das notas - quantas batidas ela vale. Deve ter a mesma quantidade de itens que a linha de notas.

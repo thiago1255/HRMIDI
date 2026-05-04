@@ -52,7 +52,7 @@ The terms are written with the letter + underline + instrument name, ex: `C_PIAN
 **C** *clef* (Mandatory)
 :	Sets the clef of this track. Can be written with number or using textual mode:
 	
-	Available clefs: Bass = -1, Treble = 0, Alto = Tenor = 1. Other integer numbers can be used besides those. 
+	Available clefs: Bass = -1, Treble = 0, Alto = Tenor = 1. Other integer numbers can be used besides those, the limit is from -5 to 5.
 
 **N** *keys* (Mandatory)
 :	Sets each key and break of the track, each one must be split using the *Formatting* described on section **DESCRIPTION**.
@@ -66,6 +66,8 @@ The terms are written with the letter + underline + instrument name, ex: `C_PIAN
 	To write the key one clef above or below, must use `+` or `-` (being cumulative) before the key, without split.
 	
 	With dodecaphonic mode enabled, numbers notes will be read from 1-12, an attemp to write sharp/flat on a number will result in being read as the "numeric" (non dodecaphonic) mode previously cited.
+	
+	They keys are limited from 0 to 127, this is, from "Do at clef -5" to "Sol at clef 5"
 
 **T** *time* (Mandatory)
 :	Sets the duration of each key or break from the keys line - how many beats. Must have the same amount of items as the keys line.

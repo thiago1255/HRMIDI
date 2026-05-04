@@ -41,7 +41,7 @@ Check the [manual](man/man1/hrmidi.1.md) for more details.
 # Todo:
 ### Version 1:
 - Add alternative ways to write notes (sharp and flat when normal notes could be used)
-- Add checks for clefs and notes limits
+- ~~Add checks for clefs and notes limits~~
 - Add limit of 14 instruments, merge channels with same instrument
 - ~~Add all instruments~~ (+ a new way to write for percussion)
 ### Version 2:

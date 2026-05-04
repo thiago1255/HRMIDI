@@ -580,6 +580,7 @@ def parse_hrmidi() -> list:
 			if not isinstance(clef, int):
 				if clef not in clefs.keys(): print_error(f"invalid clef name at line {number}")
 				clef = clefs[clef]
+			if -5 > clef > 5: print_error(f"invalid clef at line {number} (limit is from -5 to 5)")
 			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "keys": [], "shift": [], "times": []}
 			continue
 		if line.startswith("n_"):
@@ -590,11 +591,14 @@ def parse_hrmidi() -> list:
 			instrument: str = items[0].replace('n_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			for key in items[1:]:
-				temp["shift"].append(key.count('+') - key.count('-'))
+				k: str = f"{key}"
+				shift: int = (key.count('+') - key.count('-'))
 				key = key.replace('-', '').replace('+', '')
 				if detected_dodeca: key = str_to_number(key)
-				if key not in keys.keys(): print_error(f"invalid key '{key}' at line {number}")
+				if key not in keys.keys(): print_error(f"invalid key '{k}' at line {number}")
+				if 1 > (key + ((track['clef'] + 5) * 12) + (shift * 12)) > 128: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
 				temp["keys"].append(keys[key])
+				temp["shift"].append(shift)
 			step["n"] = True
 			continue
 		if line.startswith("t_"):
