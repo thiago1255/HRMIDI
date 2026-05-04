@@ -49,8 +49,6 @@ Sets a track for an instrument, the declaration must start with the clef.
 
 The terms are written with the letter + underline + instrument name, ex: `C_PIANO`.
 
-The currently implemented instruments are: piano, violino.
-
 **C** *clef* (Mandatory)
 :	Sets the clef of this track. Can be written with number or using textual mode:
 	
@@ -76,6 +74,139 @@ The currently implemented instruments are: piano, violino.
 
 **M** *number* [Optional]
 :	Time modifier for the track, each duration is divided by this number.
+
+# INSTRUMENTS
+
+The available instruments on midi are:
+
+1. piano
+2. piano-bright
+3. piano-electric-acoustic
+4. piano-honky-tonk
+5. piano-electric-rhodes
+6. piano-electric-chorused
+7. harpsichord
+8. clavinet
+9. celesta
+10. glockenspiel
+11. music-box
+12. vibraphone
+13. marimba
+14. xylophone
+15. tubular-bells
+16. dulcimer
+17. organ-drawbar
+18. organ-percussive
+19. organ-rock
+20. organ-church
+21. organ-reed
+22. accordion
+23. harmonica
+24. accordion-tango
+25. guitar-nylon
+26. guitar-steel
+27. guitar-electric-jazz
+28. guitar-electric-clean
+29. guitar-electric-muted
+30. guitar-overdriven
+31. guitar-distortion
+32. guitar-harmonics
+33. bass
+34. bass-electric-finger
+35. bass-electric-pick
+36. bass-fretless
+37. bass-slap-1
+38. bass-slap-2
+39. bass-synth-1
+40. bass-synth-2
+41. violin
+42. viola
+43. cello
+44. contrabass
+45. strings-tremolo
+46. strings-pizzicato
+47. orchestral-harp
+48. timpani
+49. strings-ensemble
+50. strings-ensemble-slow
+51. strings-synth-1
+52. strings-synth-2
+53. choir-ah
+54. voice-oh
+55. voice-synth
+56. orchestra-hit
+57. trumpet
+58. trombone
+59. tuba
+60. trumpet-muted
+61. french-horn
+62. brass-section
+63. brass-synth-1
+64. brass-synth-2
+65. sax-soprano
+66. sax-alto
+67. sax-tenor
+68. sax-baritone
+69. oboe
+70. english-horn
+71. bassoon
+72. clarinet
+73. piccolo
+74. flute
+75. recorder
+76. flute-pan
+77. blown-bottle
+78. shakuhachi
+79. whistle
+80. ocarina
+81. lead-square
+82. lead-sawtooth
+83. lead-calliope
+84. lead-chiff
+85. lead-charang
+86. lead-voice
+87. lead-fifths
+88. lead-bass-lead
+89. pad-new-age
+90. pad-warm
+91. pad-polysynth
+92. pad-choir
+93. pad-bowed-glass
+94. pad-metallic
+95. pad-halo
+96. pad-sweep
+97. fx-rain
+98. fx-soundtrack
+99. fx-crystal
+100. fx-atmosphere
+101. fx-brightness
+102. fx-goblins
+103. fx-echoes
+104. fx-sci-fi
+105. sitar
+106. banjo
+107. shamisen
+108. koto
+109. kalimba
+110. bag-pipe
+111. fiddle
+112. shehnai
+113. bell-tinkle
+114. agogo
+115. drum-steel
+116. woodblock
+117. drum-taiko
+118. drum-tom
+119. drum-synth
+120. cymbal-reverse
+121. guitar-fret
+122. breath
+123. seashore
+124. bird
+125. telephone-ring
+126. helicopter
+127. applause
+128. gunshot
 
 # SEE ALSO
 
