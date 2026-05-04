@@ -140,7 +140,7 @@ en_instruments: dict = {
 	# Pianos
 	'piano':					1
 	,'piano-bright':			2
-	,'piano-eletric-acoustic':	3
+	,'piano-electric-acoustic':	3
 	,'piano-honky-tonk':		4
 	,'piano-electric-rhodes':	5
 	,'piano-electric-chorused':	6
@@ -235,13 +235,13 @@ en_instruments: dict = {
 	,'lead-charang':			85
 	,'lead-voice':				86
 	,'lead-fifths':				87
-	,'lead-bass':				88
+	,'lead-bass-lead':			88
 	# Synth pad
 	,'pad-new-age':				89
 	,'pad-warm':				90
 	,'pad-polysynth':			91
 	,'pad-choir':				92
-	,'pad-bowed':				93
+	,'pad-bowed-glass':			93
 	,'pad-metallic':			94
 	,'pad-halo':				95
 	,'pad-sweep':				96
@@ -262,7 +262,7 @@ en_instruments: dict = {
 	,'kalimba':					109
 	,'bag-pipe':				110
 	,'fiddle':					111
-	,'shanai':					112
+	,'shehnai':					112
 	# Percussive
 	,'bell-tinkle':				113
 	,'agogo':					114
@@ -277,14 +277,156 @@ en_instruments: dict = {
 	,'breath':					122
 	,'seashore':				123
 	,'bird':					124
-	,'telephone':				125
+	,'telephone-ring':			125
 	,'helicopter':				126
 	,'applause':				127
 	,'gunshot':					128
 }
 pt_instruments: dict = {
-	'piano':	1
-	,'violino':	41
+	# Pianos
+	'piano':						1
+	,'piano-brilhante':				2
+	,'piano-eletrico-acustico':		3
+	,'piano-honky-tonk':			4
+	,'piano-eletrico-rhodes':		5
+	,'piano-eletrico-chorused':		6
+	,'cravo':						7
+	,'clavineta':					8
+	# Percussao cromatica
+	,'celesta':						9
+	,'glockenspiel':				10
+	,'caixa-musical':				11
+	,'vibrafone':					12
+	,'marimba':						13
+	,'xilofone':					14
+	,'sinos-tubulares':				15
+	,'dulcimer':					16
+	# Orgãos
+	,'orgao_hammond':				17
+	,'orgao_percussivo':			18
+	,'orgao_rock':					19
+	,'orgao_igreja':				20
+	,'orgao_palheta':				21
+	,'acordeao':					22
+	,'harmonica':					23
+	,'bandoneao':					24
+	# Guitarras
+	,'guitarra-nylon':				25
+	,'guitarra-aco':				26
+	,'guitarra-eletrica-jazz':		27
+	,'guitarra-eletrica-limpa':		28
+	,'guitarra-eletrica-abafada':	29
+	,'guitarra-saturacao':			30
+	,'guitarra-distorcao':			31
+	,'guitarra-harmonicos':			32
+	# Baixos
+	,'baixo':						33
+	,'baixo-eletrico-dedilhado':	34
+	,'baixo-eletrico-palheta':		35
+	,'baixo-sem-trastes':			36
+	,'baixo-percutido-1':			37
+	,'baixo-percutido-2':			38
+	,'baixo-sintetico-1':			39
+	,'baixo-sintetico-2':			40
+	# Cordas
+	,'violino':						41
+	,'viola':						42
+	,'violoncelo':					43
+	,'contrabaixo':					44
+	,'cordas-tremolo':				45
+	,'cordas-pizzicato':			46
+	,'harpa':						47
+	,'timpanos':					48 # cordas ???
+	# Orquestra
+	,'cordas-orquestra':			49
+	,'cordas-orquestra-devagar':	50
+	,'cordas-sinteticas-1':			51
+	,'cordas-sinteticas-2':			52
+	,'coral-ah':					53
+	,'voz-oh':						54
+	,'voz-sintetica':				55
+	,'batida-orquestral':			56
+	# Metais
+	,'trompete':					57
+	,'trombone':					58
+	,'tuba':						59
+	,'trompete-abafado':			60
+	,'trompa':						61
+	,'metais':						62
+	,'metais-sintericos-1':			63
+	,'metais-sintericos-2':			64
+	# Palhetas
+	,'saxofone-soprano':			65
+	,'saxofone-alto':				66
+	,'saxofone-tenor':				67
+	,'saxofone-baritono':			68
+	,'oboe':						69
+	,'corno-ingles':				70
+	,'fagote':						71
+	,'clarinete':					72
+	# Flautas
+	,'flautim':						73
+	,'flauta-transversal':			74
+	,'flauta-doce':					75
+	,'flauta-de-pa':				76
+	,'garrafa':						77
+	,'shakuhachi':					78
+	,'apito':						79
+	,'ocarina':						80
+	# Solos
+	,'solo-quadrada':				81
+	,'solo-dente-serra':			82
+	,'solo-caliope':				83
+	,'solo-chiff':					84
+	,'solo-charang':				85
+	,'solo-voz':					86
+	,'solo-quintas':				87
+	,'solo-baixo-solo':				88
+	# Fundos
+	,'fundo-nova-era'				89
+	,'fundo-morno'					90
+	,'fundo-polissintetico'			91
+	,'fundo-coral'					92
+	,'fundo-vidro-arcado'			93
+	,'fundo-metalico'				94
+	,'fundo-halo'					95
+	,'fundo-varredura'				96
+	# FX
+	,'fx-chuva':					97
+	,'fx-trilha-sonora':			98
+	,'fx-cristal':					99
+	,'fx-atmosfera':				100
+	,'fx-brilhos':					101
+	,'fx-goblins':					102
+	,'fx-ecos':						103
+	,'fx-ficcao-cientifica':		104
+	# Etnicos
+	,'sitar':						105
+	,'banjo':						106
+	,'shamisen':					107
+	,'koto':						108
+	,'kalimba':						109
+	,'gaita-de-foles':				110
+	,'fiddle':						111
+	,'shehnai':						112
+	# Percussao
+	,'sininho':						113
+	,'agogo':						114
+	,'tambor-aco':					115
+	,'bloco-madeira':				116
+	,'tambor-taiko':				117
+	,'tambor-tom':					118
+	,'tambor-sintetizado':			119
+	,'pratos-reverso':				120
+	# Efeitos
+	,'guitarra-deslizo':			121
+	,'respiracao':					122
+	,'praia':						123
+	,'passaro':						124
+	,'telefone-tocando':			125
+	,'helicoptero':					126
+	,'aplausos':					127
+	,'tiro':						128
 }
 
 keys_numeric: dict = {
