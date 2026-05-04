@@ -302,11 +302,11 @@ pt_instruments: dict = {
 	,'sinos-tubulares':				15
 	,'dulcimer':					16
 	# Orgãos
-	,'orgao_hammond':				17
-	,'orgao_percussivo':			18
-	,'orgao_rock':					19
-	,'orgao_igreja':				20
-	,'orgao_palheta':				21
+	,'orgao-hammond':				17
+	,'orgao-percussivo':			18
+	,'orgao-rock':					19
+	,'orgao-igreja':				20
+	,'orgao-palheta':				21
 	,'acordeao':					22
 	,'harmonica':					23
 	,'bandoneao':					24
@@ -353,8 +353,8 @@ pt_instruments: dict = {
 	,'trompete-abafado':			60
 	,'trompa':						61
 	,'metais':						62
-	,'metais-sintericos-1':			63
-	,'metais-sintericos-2':			64
+	,'metais-sinteticos-1':			63
+	,'metais-sinteticos-2':			64
 	# Palhetas
 	,'saxofone-soprano':			65
 	,'saxofone-alto':				66
@@ -383,14 +383,14 @@ pt_instruments: dict = {
 	,'solo-quintas':				87
 	,'solo-baixo-solo':				88
 	# Fundos
-	,'fundo-nova-era'				89
-	,'fundo-morno'					90
-	,'fundo-polissintetico'			91
-	,'fundo-coral'					92
-	,'fundo-vidro-arcado'			93
-	,'fundo-metalico'				94
-	,'fundo-halo'					95
-	,'fundo-varredura'				96
+	,'fundo-nova-era':				89
+	,'fundo-morno':					90
+	,'fundo-polissintetico':		91
+	,'fundo-coral':					92
+	,'fundo-vidro-arcado':			93
+	,'fundo-metalico':				94
+	,'fundo-halo':					95
+	,'fundo-varredura':				96
 	# FX
 	,'fx-chuva':					97
 	,'fx-trilha-sonora':			98
