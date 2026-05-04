@@ -670,7 +670,15 @@ def make_midi() -> bytes:
 		,bytes([0xFF, 0x51, 0x03]) + (60000000 // source[0]).to_bytes(3, 'big')	# Set Tempo
 	])
 
-	for channel, track in enumerate(source[1:]):
+	channels: dict = {}
+	for track in source[1:]:
+		if track['instrument'] not in channels.keys():
+			channel = len(channels)
+			if channel > 9: channel += 1
+			channels[track['instrument']] = channel
+		else:
+			channel = channels[track['instrument']]
+
 		chunk: list[bytes] = [
 			vlq(0)
 			,bytes([0xC0 | channel])
