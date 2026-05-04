@@ -14,6 +14,14 @@ keys = {
 	,'_':	0
 	,'0':	0
 	
+	# -1
+	,'dob':	-1
+	,'cb':	-1
+	,'1b':	-1
+	,'do♭':	-1
+	,'c♭':	-1
+	,'1♭':	-1
+	
 	,1:		1
 	,'do':	1
 	,'c':	1
@@ -59,10 +67,24 @@ keys = {
 	,'e':	5
 	,'3':	5
 	
+	,'fab':	5
+	,'fb':	5
+	,'4b':	5
+	,'fa♭':	5
+	,'f♭':	5
+	,'4♭':	5
+	
 	,6:		6
 	,'fa':	6
 	,'f':	6
 	,'4':	6
+	
+	,'mi#':	6
+	,'e#':	6
+	,'3#':	6
+	,'mi♯':	6
+	,'e♯':	6
+	,'3♯':	6
 	
 	,7:		7
 	,'fa#':	7
@@ -124,6 +146,16 @@ keys = {
 	,'b':	12
 	,'h':	12
 	,'7':	12
+	
+	# +1
+	,'si#':	13
+	,'b#':	13
+	,'h#':	13
+	,'7#':	13
+	,'si♯':	13
+	,'b♯':	13
+	,'h♯':	13
+	,'7♯':	13
 }
 en_clefs = {
 	'bass':		-1
@@ -599,8 +631,15 @@ def parse_hrmidi() -> list:
 				key = key.replace('-', '').replace('+', '')
 				if detected_dodeca: key = str_to_number(key)
 				if key not in keys.keys(): print_error(f"invalid key '{k}' at line {number}")
+				key = keys[key]
+				if key == -1: # Do♭
+					key = 12
+					shift -= 1
+				if key == 13: # Si♯
+					key = 1
+					shift += 1
 				if 1 > (key + ((track['clef'] + 5) * 12) + (shift * 12)) > 128: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
-				temp["keys"].append(keys[key])
+				temp["keys"].append(key)
 				temp["shift"].append(shift)
 			step["n"] = True
 			continue

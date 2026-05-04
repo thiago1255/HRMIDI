@@ -40,7 +40,6 @@ Check the [manual](man/man1/hrmidi.1.md) for more details.
 
 # Todo:
 ### Version 1:
-- Add alternative ways to write notes (sharp and flat when normal notes could be used)
 - ~~Add all instruments~~ (+ a new way to write for percussion)
 ### Version 2:
 - Add support for pages (when one end, the other begins)
