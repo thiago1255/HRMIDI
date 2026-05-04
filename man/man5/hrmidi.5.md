@@ -210,6 +210,8 @@ The available instruments on midi are:
 127. applause
 128. gunshot
 
+You can only use the maximum of 15 of the instruments above in the same file.
+
 # SEE ALSO
 
 **hrmidi(1)** - compiler for the hrmidi language.

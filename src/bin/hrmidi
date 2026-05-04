@@ -536,6 +536,7 @@ def parse_hrmidi() -> list:
 	source: list = [bpm]
 	detected_lang: bool = False; detected_bpm: bool = False; detected_ver: bool = False; detected_dodeca = False
 	step: dict = {"c": False, "n": False, "t": False, "m": False}
+	instruments_used: set = set()
 	temp: dict = {}
 	for number, line in lines.items():
 		if line.startswith("lang"):
@@ -582,6 +583,8 @@ def parse_hrmidi() -> list:
 				clef = clefs[clef]
 			if -5 > clef > 5: print_error(f"invalid clef at line {number} (limit is from -5 to 5)")
 			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "keys": [], "shift": [], "times": []}
+			instruments_used.add(instruments[instrument])
+			if len(instruments_used) > 15: print_error("too many normal instruments used, the limit is 15")
 			continue
 		if line.startswith("n_"):
 			if not step["c"]: print_error(f"line {number} does not have clef declaration above")

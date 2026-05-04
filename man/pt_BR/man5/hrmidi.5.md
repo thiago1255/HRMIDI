@@ -210,6 +210,8 @@ Os instrumentos disponiveis em midi são:
 127. aplausos
 128. tiro
 
+Só se pode usar no máximo 15 dos instrumentos acima no mesmo arquivo.
+
 # VER TAMBÉM
 
 **hrmidi(1)** - compilador da linguagem hrmidi.
