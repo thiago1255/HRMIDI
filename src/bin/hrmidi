@@ -313,7 +313,60 @@ en_instruments: dict = {
 	,'helicopter':				126
 	,'applause':				127
 	,'gunshot':					128
+	
+	,'percussion'				129
 }
+
+en_percussion: dict = {
+	,'bass-2':			35
+	,'bass-1':			36
+	,'side-stick':		37
+	,'snare':			38
+	,'hand-clap':		39
+	,'snare-electric':	40
+	,'tom-floor-low':	41
+	,'hi-hat-closed':	42
+	,'tom-floor-high':	43
+	,'hi-hat-pedal':	44
+	,'tom-low':			45
+	,'hi-hat-open':		46
+	,'tom-low-mid':		47
+	,'tom-high-mid':	48
+	,'cymbal-crash-1':	49
+	,'tom-high':		50
+	,'cymbal-ride-1':	51
+	,'cymbal-chinese':	52
+	,'cymbal-bell':		53 # Ride Bell
+	,'tambourine':		54
+	,'cymbal-splash':	55
+	,'cowbell':			56
+	,'cymbal-crash-2':	57
+	,'vibraslap':		58
+	,'cymbal-ride-2':	59
+	,'bongo-high':		60
+	,'bongo-low':		61
+	,'conga-high-mute':	62
+	,'conga-high-open':	63
+	,'conga-low':		64
+	,'timbale-high':	65
+	,'timbale-low':		66
+	,'agogo-high':		67
+	,'agogo-low':		68
+	,'cabasa':			69
+	,'maracas':			70
+	,'whistle-short':	71
+	,'whistle-long':	72
+	,'guiro-short':		73
+	,'guiro-long':		74
+	,'claves':			75
+	,'woodblock-high':	76
+	,'woodblock-low':	77
+	,'cuica-mute':		78
+	,'cuica-open':		79
+	,'triangle-mute':	80
+	,'triangle-open':	81
+}
+
 pt_instruments: dict = {
 	# Pianos
 	'piano':						1
@@ -459,6 +512,58 @@ pt_instruments: dict = {
 	,'helicoptero':					126
 	,'aplausos':					127
 	,'tiro':						128
+	
+	,'percussao':					129
+}
+
+pt_percussion: dict = {
+	,'bombo-2':				35
+	,'bombo-1':				36
+	,'aro':					37
+	,'caixa':				38
+	,'palmas':				39
+	,'caixa-eletrica':		40
+	,'tom-chao-grave':		41
+	,'hi-hat-fechado':		42
+	,'tom-chao-agudo':		43
+	,'hi-hat-pedal':		44
+	,'tom-grave':			45
+	,'hi-hat-aberto':		46
+	,'tom-grave-medio':		47
+	,'tom-agudo-medio':		48
+	,'prato-crash-1':		49
+	,'tom-agudo':			50
+	,'prato-ride-1':		51
+	,'prato-chines':		52
+	,'prato-sino':			53
+	,'pandeirola':			54
+	,'prato-splash':		55
+	,'sino-vaca':			56
+	,'prato-crash-2':		57
+	,'vibraslap':			58
+	,'prato-ride-2':		59
+	,'bongo-agudo':			60
+	,'bongo-grave':			61
+	,'conga-aguda-abafada':	62
+	,'conga-aguda-aberta':	63
+	,'conga-grave':			64
+	,'timbale-agudo':		65
+	,'timbale-grave':		66
+	,'agogo-agudo':			67
+	,'agogo-grave':			68
+	,'cabasa':				69
+	,'maracas':				70
+	,'apito-curto':			71
+	,'apito-longo':			72
+	,'guiro-curto':			73
+	,'guiro-longo':			74
+	,'claves':				75
+	,'bloco-madeira-agudo':	76
+	,'bloco-madeira-grave':	77
+	,'cuica-abafada':		78
+	,'cuica-aberta':		79
+	,'triangulo-abafado':	80
+	,'triangulo-aberto':	81
 }
 
 keys_numeric: dict = {
@@ -548,9 +653,11 @@ def parse_hrmidi() -> list:
 		case "en":
 			instruments = en_instruments
 			clefs = en_clefs
+			percussion = en_percussion
 		case "pt":
 			instruments = pt_instruments
 			clefs = pt_clefs
+			percussion = pt_percussion
 		case _:
 			print_error(f'lang "{lang}" is invalid')
 	del lang
@@ -609,14 +716,18 @@ def parse_hrmidi() -> list:
 			if len(items) != 2: print_error(f"invalid arguments number at line {number} (must be two)")
 			instrument: str = items[0].replace('c_', '')
 			if instrument not in instruments.keys(): print_error(f"invalid instrument name at line {number}")
-			clef = str_to_number(items[1])
-			if not isinstance(clef, int):
-				if clef not in clefs.keys(): print_error(f"invalid clef name at line {number}")
-				clef = clefs[clef]
-			if -5 > clef > 5: print_error(f"invalid clef at line {number} (limit is from -5 to 5)")
+			if instruments[instrument] == 129:
+				if items[1] not in percussion.keys(): print_error(f"invalid percussion type at line {number}")
+				clef = percussion[items[1]]
+			else:
+				instruments_used.add(instruments[instrument])
+				if len(instruments_used) > 15: print_error("too many normal instruments used, the limit is 15")
+				clef = str_to_number(items[1])
+				if not isinstance(clef, int):
+					if clef not in clefs.keys(): print_error(f"invalid clef name at line {number}")
+					clef = clefs[clef]
+				if -5 > clef > 5: print_error(f"invalid clef at line {number} (limit is from -5 to 5)")
 			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "keys": [], "shift": [], "times": []}
-			instruments_used.add(instruments[instrument])
-			if len(instruments_used) > 15: print_error("too many normal instruments used, the limit is 15")
 			continue
 		if line.startswith("n_"):
 			if not step["c"]: print_error(f"line {number} does not have clef declaration above")
@@ -625,22 +736,25 @@ def parse_hrmidi() -> list:
 			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
 			instrument: str = items[0].replace('n_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
-			for key in items[1:]:
-				k: str = f"{key}"
-				shift: int = (key.count('+') - key.count('-'))
-				key = key.replace('-', '').replace('+', '')
-				if detected_dodeca: key = str_to_number(key)
-				if key not in keys.keys(): print_error(f"invalid key '{k}' at line {number}")
-				key = keys[key]
-				if key == -1: # Do♭
-					key = 12
-					shift -= 1
-				if key == 13: # Si♯
-					key = 1
-					shift += 1
-				if 1 > (key + ((track['clef'] + 5) * 12) + (shift * 12)) > 128: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
-				temp["keys"].append(key)
-				temp["shift"].append(shift)
+			if instruments[instrument] == 129:
+				temp["keys"] = [0 if i in ('0', '_') else 1 for i in items[1:]]
+			else:
+				for key in items[1:]:
+					k: str = f"{key}"
+					shift: int = (key.count('+') - key.count('-'))
+					key = key.replace('-', '').replace('+', '')
+					if detected_dodeca: key = str_to_number(key)
+					if key not in keys.keys(): print_error(f"invalid key '{k}' at line {number}")
+					key = keys[key]
+					if key == -1: # Do♭
+						key = 12
+						shift -= 1
+					if key == 13: # Si♯
+						key = 1
+						shift += 1
+					if 1 > (key + ((temp["clef"] + 5) * 12) + (shift * 12)) > 128: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
+					temp["keys"].append(key)
+					temp["shift"].append(shift)
 			step["n"] = True
 			continue
 		if line.startswith("t_"):

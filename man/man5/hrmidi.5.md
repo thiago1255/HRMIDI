@@ -210,7 +210,11 @@ The available instruments on midi are:
 127. applause
 128. gunshot
 
-You can only use the maximum of 15 of the instruments above in the same file.
+You can only use the maximum of 15 of the instruments above in the same file, and any number of percussions.
+
+To use percussion, you must use the `percussion` normally as instrument, but specify which one where the clef would be written, the available are:
+
+
 
 # SEE ALSO
 
