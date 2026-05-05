@@ -1,4 +1,4 @@
-% hrmidi(5) v0 | Manual of the hrmidi language
+% hrmidi(5) v1 | Manual of the hrmidi language
 % thiago1255
 % 2026
 
@@ -212,9 +212,57 @@ The available instruments on midi are:
 
 You can only use the maximum of 15 of the instruments above in the same file, and any number of percussions.
 
-To use percussion, you must use the `percussion` normally as instrument, but specify which one where the clef would be written, the available are:
+To use percussion, you must use the `percussion` normally as instrument, but specify the type where the clef would be written, the available are:
 
+- bass-2
+- bass-1
+- side-stick
+- snare
+- hand-clap
+- snare-electric
+- tom-floor-low
+- hi-hat-closed
+- tom-floor-high
+- hi-hat-pedal
+- tom-low
+- hi-hat-open
+- tom-low-mid
+- tom-high-mid
+- cymbal-crash-1
+- tom-high
+- cymbal-ride-1
+- cymbal-chinese
+- cymbal-bell
+- tambourine
+- cymbal-splash
+- cowbell
+- cymbal-crash-2
+- vibraslap
+- cymbal-ride-2
+- bongo-high
+- bongo-low
+- conga-high-mute
+- conga-high-open
+- conga-low
+- timbale-high
+- timbale-low
+- agogo-high
+- agogo-low
+- cabasa
+- maracas
+- whistle-short
+- whistle-long
+- guiro-short
+- guiro-long
+- claves
+- woodblock-high
+- woodblock-low
+- cuica-mute
+- cuica-open
+- triangle-mute
+- triangle-open
 
+On notes section of percussions, any text will be interpreted as a beat, except for the `0` and `_` than mean "no sound".
 
 # SEE ALSO
 

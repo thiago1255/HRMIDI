@@ -1,4 +1,4 @@
-% hrmidi(1) v0 | Manual of hrmidi compiler
+% hrmidi(1) v1 | Manual of hrmidi compiler
 % thiago1255
 % 2026
 

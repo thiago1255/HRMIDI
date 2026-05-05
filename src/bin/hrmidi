@@ -7,7 +7,7 @@ import sys
 from argparse import ArgumentParser
 
 # - - - - - - - constants
-version: str = "0"
+version: str = "1"
 languages: tuple[str, ...] = ('pt', 'en', 'midi')
 keys = {
 	0:		0
@@ -314,11 +314,11 @@ en_instruments: dict = {
 	,'applause':				127
 	,'gunshot':					128
 	
-	,'percussion'				129
+	,'percussion':				129
 }
 
 en_percussion: dict = {
-	,'bass-2':			35
+	'bass-2':			35
 	,'bass-1':			36
 	,'side-stick':		37
 	,'snare':			38
@@ -517,7 +517,7 @@ pt_instruments: dict = {
 }
 
 pt_percussion: dict = {
-	,'bombo-2':				35
+	'bombo-2':				35
 	,'bombo-1':				36
 	,'aro':					37
 	,'caixa':				38

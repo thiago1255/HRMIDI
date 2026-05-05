@@ -1,4 +1,4 @@
-% hrmidi(5) v0 | Manual da linguagem hrmidi
+% hrmidi(5) v1 | Manual da linguagem hrmidi
 % thiago1255
 % 2026
 
@@ -210,7 +210,59 @@ Os instrumentos disponiveis em midi são:
 127. aplausos
 128. tiro
 
-Só se pode usar no máximo 15 dos instrumentos acima no mesmo arquivo.
+Só se pode usar no máximo 15 dos instrumentos acima no mesmo arquivo, e qualquer número de percussões.
+
+Para usar percussão, deve-se usar `percussao` assim como qualquer instrumento, mas onde seria a clave, colocar o tipo, estão disponíveis:
+
+- bombo-2
+- bombo-1
+- aro
+- caixa
+- palmas
+- caixa-eletrica
+- tom-chao-grave
+- hi-hat-fechado
+- tom-chao-agudo
+- hi-hat-pedal
+- tom-grave
+- hi-hat-aberto
+- tom-grave-medio
+- tom-agudo-medio
+- prato-crash-1
+- tom-agudo
+- prato-ride-1
+- prato-chines
+- prato-sino
+- pandeirola
+- prato-splash
+- sino-vaca
+- prato-crash-2
+- vibraslap
+- prato-ride-2
+- bongo-agudo
+- bongo-grave
+- conga-aguda-abafada
+- conga-aguda-aberta
+- conga-grave
+- timbale-agudo
+- timbale-grave
+- agogo-agudo
+- agogo-grave
+- cabasa
+- maracas
+- apito-curto
+- apito-longo
+- guiro-curto
+- guiro-longo
+- claves
+- bloco-madeira-agudo
+- bloco-madeira-grave
+- cuica-abafada
+- cuica-aberta
+- triangulo-abafado
+- triangulo-aberto
+
+Na parte das notas das percussões, qualquer texto vai ser interpretado como uma batida, com exceção de `0` e `_` que significam pausas.
 
 # VER TAMBÉM
 
