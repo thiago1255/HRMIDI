@@ -39,11 +39,10 @@ In order to install the *man pages*, run the script `convert-man-pages.sh` befor
 Check the [manual](man/man1/hrmidi.1.md) for more details.
 
 # Todo:
-### Version 1:
-- ~~Add all instruments~~ (+ a new way to write for percussion)
 ### Version 2:
 - Add support for pages (when one end, the other begins)
 - Avoid floating point (+ add constant for ticks)
+- Better formating on dicts (avoid huge lists)
 ### Version 3:
 - Simultaneous notes with `(note note ...)`
 - Allow to write many `N_` and `T_` at same tracks (make all `N_` follow the `T_` below ?)
