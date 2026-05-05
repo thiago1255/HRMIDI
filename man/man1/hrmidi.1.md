@@ -31,7 +31,7 @@ For more info on the language see **hrmidi(5)**.
 	
 	Keys format: n (numeric) f (phonetic) a (alfabetic). Default: n
 	
-	Breaks format: 0 (numeric) _ (underline). Default: 0
+	Breaks format: 0 (numeric) _ (underline). This will also decide if percussion notes will be 1 or |. Default: 0
 	
 	Clefs format: m (numeric) t (text). Default: t
 	

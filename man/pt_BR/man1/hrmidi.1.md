@@ -31,7 +31,7 @@ Para mais informações sobre a linguagem ver **hrmidi(5)**.
 	
 	Formato das notas: n (numérico) f (fonético) a (alfabética). Padrão: n
 	
-	Formato de espaços: 0 (numérico) _ (linha). Padrão: 0
+	Formato de espaços: 0 (numérico) _ (linha). Isso também decide se as notas de percussão serão 1 ou |. Padrão: 0
 	
 	Formato das claves: m (numérico) t (textual). Padrão: t
 	

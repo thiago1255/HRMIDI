@@ -737,7 +737,7 @@ def parse_hrmidi() -> list:
 			instrument: str = items[0].replace('n_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			if instruments[instrument] == 129:
-				temp["keys"] = [0 if i in ('0', '_') else 1 for i in items[1:]]
+				temp["keys"] = [0 if i in ('0', '_') else 14 for i in items[1:]]
 			else:
 				for key in items[1:]:
 					k: str = f"{key}"
@@ -825,39 +825,63 @@ def make_midi() -> bytes:
 
 	channels: dict = {}
 	for track in source[1:]:
-		if track['instrument'] not in channels.keys():
+		instrument: int = track['instrument'] - 1
+		
+		if instrument == 128:
+			instrument = 0
+			channel = 9
+		elif instrument not in channels.keys():
 			channel = len(channels)
 			if channel > 9: channel += 1
-			channels[track['instrument']] = channel
+			channels[instrument] = channel
 		else:
-			channel = channels[track['instrument']]
+			channel = channels[instrument]
 
 		chunk: list[bytes] = [
 			vlq(0)
 			,bytes([0xC0 | channel])
-			,bytes([track['instrument'] - 1])
+			,bytes([instrument])
 		]
 
 		delay: int = 0
-		for k, s, t in zip(track['keys'], track['shift'], track['times']):
-			t = int(t * 960 / track['modifier'])
-			if k != 0:
-				k -= 1 # In midi they start at 0, not 1
-				k += ((track['clef'] + 5) * 12) # Sets the clef
-				k += (s * 12) # Shift the clef
-				chunk += [
-					vlq(delay)					# When the note will start, after previous event
-					,bytes([0x90 | channel])	# Note On Event
-					,bytes([k])					# Note Value
-					,bytes([63])				# "velocity" - in pratice the volume
-					,vlq(t)						# When the note will end
-					,bytes([0x80 | channel])	# Note Off Event
-					,bytes([k])					# Note Value
-					,bytes([0])					# "velocity" - some instruments may act diferent with non 0
-				]
-				delay = 0
-			else:
-				delay += t
+		if channel == 9:
+			for k, t in zip(track['keys'], track['times']):
+				t = int(t * 960 / track['modifier'])
+				if k == 0:
+					delay += t
+				else:
+					k = track['clef'] # In midi percussion channel, key defines the instrument
+					chunk += [
+						vlq(delay)					# When the note will start, after previous event
+						,bytes([0x90 | channel])	# Note On Event
+						,bytes([k])					# Note Value
+						,bytes([63])				# "velocity" - in pratice the volume
+						,vlq(t)						# When the note will end
+						,bytes([0x80 | channel])	# Note Off Event
+						,bytes([k])					# Note Value
+						,bytes([0])					# "velocity" - some instruments may act diferent with non 0
+					]
+					delay = 0
+		else:
+			for k, s, t in zip(track['keys'], track['shift'], track['times']):
+				t = int(t * 960 / track['modifier'])
+				if k == 0:
+					delay += t
+				else:
+					k -= 1 # In midi they start at 0, not 1
+					k += ((track['clef'] + 5) * 12) # Sets the clef
+					k += (s * 12) # Shift the clef
+					chunk += [
+						vlq(delay)					# When the note will start, after previous event
+						,bytes([0x90 | channel])	# Note On Event
+						,bytes([k])					# Note Value
+						,bytes([63])				# "velocity" - in pratice the volume
+						,vlq(t)						# When the note will end
+						,bytes([0x80 | channel])	# Note Off Event
+						,bytes([k])					# Note Value
+						,bytes([0])					# "velocity" - some instruments may act diferent with non 0
+					]
+					delay = 0					
 		result += mtrk(chunk)
 
 	return bytes(result)
@@ -876,33 +900,35 @@ def make_hr() -> str:
 		keys_dict: dict = keys_numeric.copy()
 
 	if '_' in hrmidi_format:
-		keys_dict[0] = "_" 
+		keys_dict[0] = "_"
+		keys_dict[14] = "|"
 	else:
 		keys_dict[0] = "0"
+		keys_dict[14] = "1"
 
-	instruments_dict: dict = {}
 	clefs_dict: dict = {}
 	match language:
 		case 'en':
-			for i, n in en_instruments.items():
-				instruments_dict[n] = i
+			instruments_dict: dict = {n:i for i, n in en_instruments.items()}
 			if 'm' in hrmidi_format:
-				clefs_dict = {n:str(n) for n in range(-16, 17)}
+				clefs_dict = {n:str(n) for n in range(-5, 6)}
 			else:
 				for i, n in en_clefs.items():
 					clefs_dict[n] = i
+			clefs_dict |= {n:i for i, n in en_percussion.items()}
 		case 'pt':
-			for i, n in pt_instruments.items():
-				instruments_dict[n] = i
+			instruments_dict: dict = {n:i for i, n in pt_instruments.items()}
 			if 'm' in hrmidi_format:
-				clefs_dict = {n:str(n) for n in range(-16, 17)}
+				clefs_dict = {n:str(n) for n in range(-5, 6)}
 			else:
 				for i, n in pt_clefs.items():
 					clefs_dict[n] = i
+			clefs_dict |= {n:i for i, n in pt_percussion.items()}
 
 	convert_modifier: bool = ('c' in hrmidi_format)
 
 	for track in source[1:]:
+		if not track['shift']: track['shift'] = [0] * len(track['keys'])
 		instrument: str = instruments_dict[track["instrument"]].upper()
 		modifier = track['modifier']
 		result += f"C_{instrument} {clefs_dict[track['clef']]}\nN_{instrument} "
