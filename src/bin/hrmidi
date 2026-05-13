@@ -737,9 +737,10 @@ def parse_hrmidi() -> list:
 			instrument: str = items[0].replace('n_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			if instruments[instrument] == 129:
-				temp["keys"] = [0 if i in ('0', '_') else 14 for i in items[1:]]
+				temp["keys"] = [0 if i in ('0', '_') else 14 for i in items[1:] if i]
 			else:
 				for key in items[1:]:
+					if not key: continue
 					k: str = f"{key}"
 					shift: int = (key.count('+') - key.count('-'))
 					key = key.replace('-', '').replace('+', '')
@@ -765,6 +766,7 @@ def parse_hrmidi() -> list:
 			instrument: str = items[0].replace('t_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			for time in items[1:]:
+				if not time: continue
 				time = str_to_number(time)
 				if isinstance(time, str): print_error(f"invalid time '{time}' at line {number}")
 				temp["times"].append(time)
