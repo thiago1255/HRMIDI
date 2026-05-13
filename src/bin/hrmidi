@@ -713,6 +713,7 @@ def parse_hrmidi() -> list:
 					print_error(f"new track started at line {number} withowt finish the previous (missing at least keys section)")
 			step["c"] = True
 			items = re.split(r'[;\s]+', line)
+			if not items[-1]: items.pop()
 			if len(items) != 2: print_error(f"invalid arguments number at line {number} (must be two)")
 			instrument: str = items[0].replace('c_', '')
 			if instrument not in instruments.keys(): print_error(f"invalid instrument name at line {number}")
@@ -733,14 +734,14 @@ def parse_hrmidi() -> list:
 			if not step["c"]: print_error(f"line {number} does not have clef declaration above")
 			if step["n"]: print_error(f"duplicate and/or invalid keys section at line {number}")
 			items = re.split(r'[;\s]+', line)
+			if not items[-1]: items.pop()
 			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
 			instrument: str = items[0].replace('n_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			if instruments[instrument] == 129:
-				temp["keys"] = [0 if i in ('0', '_') else 14 for i in items[1:] if i]
+				temp["keys"] = [0 if i in ('0', '_') else 14 for i in items[1:]]
 			else:
 				for key in items[1:]:
-					if not key: continue
 					k: str = f"{key}"
 					shift: int = (key.count('+') - key.count('-'))
 					key = key.replace('-', '').replace('+', '')
@@ -762,11 +763,11 @@ def parse_hrmidi() -> list:
 			if not step["c"]: print_error(f"line {number} does not have clef declaration above")
 			if step["t"]: print_error(f"duplicate and/or invalid time section at line {number}")
 			items = re.split(r'[;\s]+', line)
+			if not items[-1]: items.pop()
 			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
 			instrument: str = items[0].replace('t_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			for time in items[1:]:
-				if not time: continue
 				time = str_to_number(time)
 				if isinstance(time, str): print_error(f"invalid time '{time}' at line {number}")
 				temp["times"].append(time)
@@ -776,6 +777,7 @@ def parse_hrmidi() -> list:
 			if not step["c"]: print_error(f"line {number} does not have clef declaration above")
 			if step["m"]: print_error(f"duplicate and/or invalid modifier at line {number}")
 			items = re.split(r'[;\s]+', line)
+			if not items[-1]: items.pop()
 			if len(items) != 2: print_error(f"invalid arguments number at line {number} (must be two)")
 			instrument: str = items[0].replace('m_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
