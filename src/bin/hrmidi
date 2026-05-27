@@ -674,7 +674,7 @@ def parse_hrmidi() -> list:
 	
 	source: list = [bpm]
 	detected_lang: bool = False; detected_bpm: bool = False; detected_ver: bool = False; detected_dodeca = False
-	step: dict = {"c": False, "n": False, "t": False, "m": False}
+	step_c: bool = False; step_n: bool = False; step_t: bool = False; step_m: bool = False
 	instruments_used: set = set()
 	temp: dict = {}
 	for number, line in lines.items():
@@ -700,18 +700,18 @@ def parse_hrmidi() -> list:
 				detected_dodeca = True; continue
 		
 		if line.startswith("c_"):
-			if step["c"]:
-				if step["n"]:
-					if step["t"]:
+			if step_c:
+				if step_n:
+					if step_t:
 						if len(temp['keys']) != len(temp['times']): print_error(f"track above line {number} have different number of keys and times")
 						temp["instrument"] = instruments[temp["instrument"]]
 						source.append(temp)
-						step: dict = {"c": False, "n": False, "t": False, "m": False}
+						step_c, step_n, step_t, step_m = False, False, False, False
 					else:
 						print_error(f"new track started at line {number} withowt finish the previous (missing time section)")
 				else:
 					print_error(f"new track started at line {number} withowt finish the previous (missing at least keys section)")
-			step["c"] = True
+			step_c = True
 			items = re.split(r'[;\s]+', line)
 			if not items[-1]: items.pop()
 			if len(items) != 2: print_error(f"invalid arguments number at line {number} (must be two)")
@@ -731,8 +731,8 @@ def parse_hrmidi() -> list:
 			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "keys": [], "shift": [], "times": []}
 			continue
 		if line.startswith("n_"):
-			if not step["c"]: print_error(f"line {number} does not have clef declaration above")
-			if step["n"]: print_error(f"duplicate and/or invalid keys section at line {number}")
+			if not step_c: print_error(f"line {number} does not have clef declaration above")
+			if step_n: print_error(f"duplicate and/or invalid keys section at line {number}")
 			items = re.split(r'[;\s]+', line)
 			if not items[-1]: items.pop()
 			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
@@ -757,11 +757,11 @@ def parse_hrmidi() -> list:
 					if 1 > (key + ((temp["clef"] + 5) * 12) + (shift * 12)) > 128: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
 					temp["keys"].append(key)
 					temp["shift"].append(shift)
-			step["n"] = True
+			step_n = True
 			continue
 		if line.startswith("t_"):
-			if not step["c"]: print_error(f"line {number} does not have clef declaration above")
-			if step["t"]: print_error(f"duplicate and/or invalid time section at line {number}")
+			if not step_c: print_error(f"line {number} does not have clef declaration above")
+			if step_t: print_error(f"duplicate and/or invalid time section at line {number}")
 			items = re.split(r'[;\s]+', line)
 			if not items[-1]: items.pop()
 			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
@@ -771,11 +771,11 @@ def parse_hrmidi() -> list:
 				time = str_to_number(time)
 				if isinstance(time, str): print_error(f"invalid time '{time}' at line {number}")
 				temp["times"].append(time)
-			step["t"] = True
+			step_t = True
 			continue
 		if line.startswith("m_"):
-			if not step["c"]: print_error(f"line {number} does not have clef declaration above")
-			if step["m"]: print_error(f"duplicate and/or invalid modifier at line {number}")
+			if not step_c: print_error(f"line {number} does not have clef declaration above")
+			if step_m: print_error(f"duplicate and/or invalid modifier at line {number}")
 			items = re.split(r'[;\s]+', line)
 			if not items[-1]: items.pop()
 			if len(items) != 2: print_error(f"invalid arguments number at line {number} (must be two)")
@@ -785,13 +785,13 @@ def parse_hrmidi() -> list:
 			if isinstance(modifier, str): print_error(f"modifier at line {number} must be a valid number or fraction")
 			if modifier == 0: print_error(f"modifier at line {number} cannot be zero")
 			temp["modifier"] = modifier
-			step["m"] = True
+			step_m = True
 			continue
 		print_error(f"unknow instruction at line {number}")
 	
-	if not step["c"]: print_error(f"no tracks found")
-	if not step["n"]: print_error(f"last track missing at least keys section")
-	if not step["t"]: print_error(f"last track missing time section")
+	if not step_c: print_error(f"no tracks found")
+	if not step_n: print_error(f"last track missing at least keys section")
+	if not step_t: print_error(f"last track missing time section")
 	if len(temp['keys']) != len(temp['times']): print_error(f"last track have different number of keys and times")
 	temp["instrument"] = instruments[temp["instrument"]]
 	source.append(temp)
@@ -811,6 +811,8 @@ def make_midi() -> bytes:
 		o += vlq(0)
 		o += bytes([0xFF, 0x2F, 0x00]) # End of Track
 		return b"MTrk" + len(o).to_bytes(4, 'big') + o
+	
+	TICKS:int = 960
 
 	result: bytearray = bytearray()
 
@@ -818,7 +820,7 @@ def make_midi() -> bytes:
 	result += (6).to_bytes(4, 'big')			# Header standard size
 	result += (1).to_bytes(2, 'big')			# Midi format, there is 0, 1 and 2
 	result += (len(source)).to_bytes(2, 'big')	# How many track chunks
-	result += (960).to_bytes(2, 'big')			# Some timing stuff
+	result += (TICKS).to_bytes(2, 'big')			# Some timing stuff
 
 	result += mtrk([
 		vlq(0)																	# Deltatime
@@ -850,7 +852,7 @@ def make_midi() -> bytes:
 		delay: int = 0
 		if channel == 9:
 			for k, t in zip(track['keys'], track['times']):
-				t = int(t * 960 / track['modifier'])
+				t = int(t * TICKS / track['modifier'])
 				if k == 0:
 					delay += t
 				else:
@@ -868,7 +870,7 @@ def make_midi() -> bytes:
 					delay = 0
 		else:
 			for k, s, t in zip(track['keys'], track['shift'], track['times']):
-				t = int(t * 960 / track['modifier'])
+				t = int(t * TICKS / track['modifier'])
 				if k == 0:
 					delay += t
 				else:
