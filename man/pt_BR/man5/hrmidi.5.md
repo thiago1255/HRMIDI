@@ -40,8 +40,11 @@ Linhas que definem elementos universais para todo o arquivo, podem ser escritos 
 **VER** *versão* [Opcional]
 :	Define a versão da linguagem, poderá ter usos futuros por motivos de compatibilidade.
 
-*DODECA** [Opcional]
-:	Ativa o modo dodecafonico para trilhas abaixo.
+**PAGINA** ou **PAG** [Opcional]
+:	Toca todas as trilhas dentro antes de começar as trilhas da próxima página. (As trilhas escritas no começo do documento pertencerão a primeira página sem usar o termo)
+
+**DODECA** [Opcional]
+:	Ativa o modo dodecafonico para trilhas abaixo, dentro da página.
 
 # TRILHA
 

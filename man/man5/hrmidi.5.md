@@ -40,8 +40,11 @@ Lines that sets global settings for the entire file, can be placed anywhere on t
 **VER** *version* [Optional]
 :	Sets the version of the language, may have uses in the future for compatibility.
 
+**PAGE** or **PAG** [Optional]
+:	Play all the tracks inside before start the tracks of the next page. (Tracks at the beggining of the document will belong to the first page, withowt using the term)
+
 **DODECA** [Optional]
-:	Enables the dodecaphonic mode for tracks below it.
+:	Enables the dodecaphonic mode for tracks below it, inside the page.
 
 # TRACK
 

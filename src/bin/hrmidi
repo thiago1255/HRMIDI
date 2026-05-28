@@ -15,132 +15,88 @@ keys = {
 	,'0':	0
 	
 	# -1
-	,'dob':	-1
-	,'cb':	-1
-	,'1b':	-1
-	,'do♭':	-1
-	,'c♭':	-1
-	,'1♭':	-1
-	
+	,'dob':	-1	,'do♭':	-1
+	,'cb':	-1	,'c♭':	-1
+	,'1b':	-1	,'1♭':	-1
+
 	,1:		1
 	,'do':	1
 	,'c':	1
 	,'1':	1
 	
 	,2:		2
-	,'do#':	2
-	,'reb': 2
-	,'c#':	2
-	,'db':	2
-	,'1#':	2
-	,'2b':	2
-	
-	,'do♯':	2
-	,'re♭': 2
-	,'c♯':	2
-	,'d♭':	2
-	,'1♯':	2
-	,'2♭':	2
-	
+	,'do#':	2	,'do♯':	2
+	,'reb': 2	,'re♭': 2
+	,'c#':	2	,'c♯':	2
+	,'db':	2	,'d♭':	2
+	,'1#':	2	,'1♯':	2
+	,'2b':	2	,'2♭':	2
+
 	,3:		3
 	,'re':	3
 	,'d':	3
 	,'2':	3
 	
 	,4:		4
-	,'re#':	4
-	,'mib':	4
-	,'d#':	4
-	,'eb':	4
-	,'2#':	4
-	,'3b':	4
-	
-	,'re♯':	4
-	,'mi♭':	4
-	,'d♯':	4
-	,'e♭':	4
-	,'2♯':	4
-	,'3♭':	4
-	
+	,'re#':	4	,'re♯':	4
+	,'mib':	4	,'mi♭':	4
+	,'d#':	4	,'d♯':	4
+	,'eb':	4	,'e♭':	4
+	,'2#':	4	,'2♯':	4
+	,'3b':	4	,'3♭':	4
+
 	,5:		5
 	,'mi':	5
 	,'e':	5
 	,'3':	5
 	
-	,'fab':	5
-	,'fb':	5
-	,'4b':	5
-	,'fa♭':	5
-	,'f♭':	5
-	,'4♭':	5
-	
+	,'fab':	5	,'fa♭':	5
+	,'fb':	5	,'f♭':	5
+	,'4b':	5	,'4♭':	5
+
 	,6:		6
 	,'fa':	6
 	,'f':	6
 	,'4':	6
 	
-	,'mi#':	6
-	,'e#':	6
-	,'3#':	6
-	,'mi♯':	6
-	,'e♯':	6
-	,'3♯':	6
-	
+	,'mi#':	6	,'mi♯':	6
+	,'e#':	6	,'e♯':	6
+	,'3#':	6	,'3♯':	6
+
 	,7:		7
-	,'fa#':	7
-	,'solb':7
-	,'f#':	7
-	,'gb':	7
-	,'4#':	7
-	,'5b':	7
-	
-	,'fa♯':	7
-	,'sol♭':7
-	,'f♯':	7
-	,'g♭':	7
-	,'4♯':	7
-	,'5♭':	7
-	
+	,'fa#':	7	,'fa♯':	7
+	,'solb':7	,'sol♭':7
+	,'f#':	7	,'f♯':	7
+	,'gb':	7	,'g♭':	7
+	,'4#':	7	,'4♯':	7
+	,'5b':	7	,'5♭':	7
+
 	,8:		8
 	,'sol':	8
 	,'g':	8
 	,'5':	8
 	
 	,9:		9
-	,'sol#':9
-	,'lab':	9
-	,'g#':	9
-	,'ab':	9
-	,'5#':	9
-	,'6b':	9
-	
-	,'sol♯':9
-	,'la♭':	9
-	,'g♯':	9
-	,'a♭':	9
-	,'5♯':	9
-	,'6♭':	9
-	
+	,'sol#':9	,'sol♯':9
+	,'lab':	9	,'la♭':	9
+	,'g#':	9	,'g♯':	9
+	,'ab':	9	,'a♭':	9
+	,'5#':	9	,'5♯':	9
+	,'6b':	9	,'6♭':	9
+
 	,10:	10
 	,'la':	10
 	,'a':	10
 	,'6':	10
 	
 	,11:	11
-	,'la#':	11
-	,'sib':	11
-	,'a#':	11
-	,'bb':	11
-	,'6#':	11
-	,'7b':	11
-	
-	,'la♯':	11
-	,'si♭':	11
-	,'a♯':	11
-	,'b♭':	11
-	,'6♯':	11
-	,'7♭':	11
-	
+	,'la#':	11	,'la♯':	11
+	,'sib':	11	,'si♭':	11
+	,'a#':	11	,'a♯':	11
+	,'bb':	11	,'b♭':	11
+	,'6#':	11	,'6♯':	11
+	,'7b':	11	,'7♭':	11
+
 	,12:	12
 	,'si':	12
 	,'b':	12
@@ -148,26 +104,15 @@ keys = {
 	,'7':	12
 	
 	# +1
-	,'si#':	13
-	,'b#':	13
-	,'h#':	13
-	,'7#':	13
-	,'si♯':	13
-	,'b♯':	13
-	,'h♯':	13
-	,'7♯':	13
+	,'si#':	13	,'si♯':	13
+	,'b#':	13	,'b♯':	13
+	,'h#':	13	,'h♯':	13
+	,'7#':	13	,'7♯':	13
 }
-en_clefs = {
-	'bass':		-1
-	,'treble':	0
-	,'tenor':	1
-	,'alto':	1
-}
-pt_clefs = {
-	'fa':	-1
-	,'sol':	0
-	,'do':	1
-}
+
+en_clefs = {'bass': -1,'treble': 0,'tenor': 1 ,'alto': 1}
+pt_clefs = {'fa': -1,'sol': 0,'do': 1}
+
 en_instruments: dict = {
 	# Pianos
 	'piano':					1
@@ -609,6 +554,8 @@ keys_alpha: dict = {
 	,12:	"B"
 }
 
+page_names: tuple[str, ...] = ('pag', 'page', 'pagina')
+
 # - - - - - - - output functions
 def print_version():
 	print(f'hrmidi version: {version}')
@@ -672,7 +619,7 @@ def parse_hrmidi() -> list:
 	else:
 		print_warning('no version specified on file')
 	
-	source: list = [bpm]
+	source: list = [bpm]; page: list = []
 	detected_lang: bool = False; detected_bpm: bool = False; detected_ver: bool = False; detected_dodeca = False
 	step_c: bool = False; step_n: bool = False; step_t: bool = False; step_m: bool = False
 	instruments_used: set = set()
@@ -701,16 +648,12 @@ def parse_hrmidi() -> list:
 		
 		if line.startswith("c_"):
 			if step_c:
-				if step_n:
-					if step_t:
-						if len(temp['keys']) != len(temp['times']): print_error(f"track above line {number} have different number of keys and times")
-						temp["instrument"] = instruments[temp["instrument"]]
-						source.append(temp)
-						step_c, step_n, step_t, step_m = False, False, False, False
-					else:
-						print_error(f"new track started at line {number} withowt finish the previous (missing time section)")
-				else:
-					print_error(f"new track started at line {number} withowt finish the previous (missing at least keys section)")
+				if not step_n: print_error(f"new track started at line {number} withowt finish the previous (missing at least keys section)")
+				if not step_t: print_error(f"new track started at line {number} withowt finish the previous (missing time section)")
+				if len(temp['keys']) != len(temp['times']): print_error(f"track above line {number} have different number of keys and times")
+				temp["instrument"] = instruments[temp["instrument"]]
+				page.append(temp)
+				step_c, step_n, step_t, step_m = False, False, False, False
 			step_c = True
 			items = re.split(r'[;\s]+', line)
 			if not items[-1]: items.pop()
@@ -787,14 +730,26 @@ def parse_hrmidi() -> list:
 			temp["modifier"] = modifier
 			step_m = True
 			continue
-		print_error(f"unknow instruction at line {number}")
+		if line.strip() in page_names:
+			if not step_c: print_error(f"new page started at line {number}, but previous didnt had any track")
+			if not step_n: print_error(f"new page started at line {number} withowt finish the previous track (missing at least keys section)")
+			if not step_t: print_error(f"new page started at line {number} withowt finish the previous track (missing time section)")
+			if len(temp['keys']) != len(temp['times']): print_error(f"track above line {number} have different number of keys and times")
+			temp["instrument"] = instruments[temp["instrument"]]
+			page.append(temp)
+			source.append(page)
+			temp = {}; page = []
+			step_c, step_n, step_t, step_m, detected_dodeca = False, False, False, False, False
+			continue
+		print_error(f'unknow instruction at line {number}')
 	
-	if not step_c: print_error(f"no tracks found")
+	if not step_c: print_error(f"no tracks found on last page")
 	if not step_n: print_error(f"last track missing at least keys section")
 	if not step_t: print_error(f"last track missing time section")
 	if len(temp['keys']) != len(temp['times']): print_error(f"last track have different number of keys and times")
 	temp["instrument"] = instruments[temp["instrument"]]
-	source.append(temp)
+	page.append(temp)
+	source.append(page)
 	return source
 
 def make_midi() -> bytes:
@@ -820,7 +775,7 @@ def make_midi() -> bytes:
 	result += (6).to_bytes(4, 'big')			# Header standard size
 	result += (1).to_bytes(2, 'big')			# Midi format, there is 0, 1 and 2
 	result += (len(source)).to_bytes(2, 'big')	# How many track chunks
-	result += (TICKS).to_bytes(2, 'big')			# Some timing stuff
+	result += (TICKS).to_bytes(2, 'big')		# Some timing stuff
 
 	result += mtrk([
 		vlq(0)																	# Deltatime
@@ -829,72 +784,77 @@ def make_midi() -> bytes:
 		,bytes([0xFF, 0x51, 0x03]) + (60000000 // source[0]).to_bytes(3, 'big')	# Set Tempo
 	])
 
-	channels: dict = {}
-	for track in source[1:]:
-		instrument: int = track['instrument'] - 1
-		
-		if instrument == 128:
-			instrument = 0
-			channel = 9
-		elif instrument not in channels.keys():
-			channel = len(channels)
-			if channel > 9: channel += 1
-			channels[instrument] = channel
-		else:
-			channel = channels[instrument]
-
-		chunk: list[bytes] = [
-			vlq(0)
-			,bytes([0xC0 | channel])
-			,bytes([instrument])
-		]
-
-		delay: int = 0
-		if channel == 9:
-			for k, t in zip(track['keys'], track['times']):
-				t = int(t * TICKS / track['modifier'])
-				if k == 0:
-					delay += t
-				else:
-					k = track['clef'] # In midi percussion channel, key defines the instrument
-					chunk += [
-						vlq(delay)					# When the note will start, after previous event
-						,bytes([0x90 | channel])	# Note On Event
-						,bytes([k])					# Note Value
-						,bytes([63])				# "velocity" - in pratice the volume
-						,vlq(t)						# When the note will end
-						,bytes([0x80 | channel])	# Note Off Event
-						,bytes([k])					# Note Value
-						,bytes([0])					# "velocity" - some instruments may act diferent with non 0
-					]
-					delay = 0
-		else:
-			for k, s, t in zip(track['keys'], track['shift'], track['times']):
-				t = int(t * TICKS / track['modifier'])
-				if k == 0:
-					delay += t
-				else:
-					k -= 1 # In midi they start at 0, not 1
-					k += ((track['clef'] + 5) * 12) # Sets the clef
-					k += (s * 12) # Shift the clef
-					chunk += [
-						vlq(delay)					# When the note will start, after previous event
-						,bytes([0x90 | channel])	# Note On Event
-						,bytes([k])					# Note Value
-						,bytes([63])				# "velocity" - in pratice the volume
-						,vlq(t)						# When the note will end
-						,bytes([0x80 | channel])	# Note Off Event
-						,bytes([k])					# Note Value
-						,bytes([0])					# "velocity" - some instruments may act diferent with non 0
-					]
-					delay = 0					
-		result += mtrk(chunk)
+	actual_offset:int = 0; next_offset:int = 0
+	for page in source[1:]:
+		channels: dict = {}
+		actual_offset += next_offset
+		for track in page:
+			instrument: int = track['instrument'] - 1
+			
+			if instrument == 128:
+				instrument = 0
+				channel = 9
+			elif instrument not in channels.keys():
+				channel = len(channels)
+				if channel > 9: channel += 1
+				channels[instrument] = channel
+			else:
+				channel = channels[instrument]
+	
+			chunk: list[bytes] = [
+				vlq(0)
+				,bytes([0xC0 | channel])
+				,bytes([instrument])
+			]
+	
+			delay: int = actual_offset
+			if channel == 9:
+				for k, t in zip(track['keys'], track['times']):
+					t = int(t * TICKS / track['modifier'])
+					next_offset += t
+					if k == 0:
+						delay += t
+					else:
+						k = track['clef'] # In midi percussion channel, key defines the instrument
+						chunk += [
+							vlq(delay)					# When the note will start, after previous event
+							,bytes([0x90 | channel])	# Note On Event
+							,bytes([k])					# Note Value
+							,bytes([63])				# "velocity" - in pratice the volume
+							,vlq(t)						# When the note will end
+							,bytes([0x80 | channel])	# Note Off Event
+							,bytes([k])					# Note Value
+							,bytes([0])					# "velocity" - some instruments may act diferent with non 0
+						]
+						delay = 0
+			else:
+				for k, s, t in zip(track['keys'], track['shift'], track['times']):
+					t = int(t * TICKS / track['modifier'])
+					next_offset += t
+					if k == 0:
+						delay += t
+					else:
+						k -= 1 # In midi they start at 0, not 1
+						k += ((track['clef'] + 5) * 12) # Sets the clef
+						k += (s * 12) # Shift the clef
+						chunk += [
+							vlq(delay)					# When the note will start, after previous event
+							,bytes([0x90 | channel])	# Note On Event
+							,bytes([k])					# Note Value
+							,bytes([63])				# "velocity" - in pratice the volume
+							,vlq(t)						# When the note will end
+							,bytes([0x80 | channel])	# Note Off Event
+							,bytes([k])					# Note Value
+							,bytes([0])					# "velocity" - some instruments may act diferent with non 0
+						]
+						delay = 0
+			result += mtrk(chunk)
 
 	return bytes(result)
 
 def make_hr() -> str:
 	global hrmidi_format
-	result: str = f"LANG {language}\nBPM {source[0]}\n\n"
+	result: str = f"LANG {language}\nBPM {source[0]}\nVER {version}\n\n"
 	if not hrmidi_format:
 		hrmidi_format = ""
 
@@ -933,27 +893,33 @@ def make_hr() -> str:
 
 	convert_modifier: bool = ('c' in hrmidi_format)
 
-	for track in source[1:]:
-		if not track['shift']: track['shift'] = [0] * len(track['keys'])
-		instrument: str = instruments_dict[track["instrument"]].upper()
-		modifier = track['modifier']
-		result += f"C_{instrument} {clefs_dict[track['clef']]}\nN_{instrument} "
-		for key, shift in zip(track['keys'], track['shift']):
-			if shift < 0:
-				result += (-shift * "-")
-			elif shift > 0:
-				result += (shift * "+")
-			result += keys_dict[key]
-			result += " 	"
-		result += f"\nT_{instrument} "
-		for time in track['times']:
-			if convert_modifier:
-				time = (time / modifier)
-			result += str(time)
-			result += " 	"
-		if not convert_modifier:
-			result += f"\nM_{instrument} {modifier}"
-		result += "\n\n"
+	first_page = True
+	for page in source[1:]:
+		if first_page:
+			first_page = False
+		else:
+			result += "PAG\n\n"
+		for track in page:
+			if not track['shift']: track['shift'] = [0] * len(track['keys'])
+			instrument: str = instruments_dict[track["instrument"]].upper()
+			modifier = track['modifier']
+			result += f"C_{instrument} {clefs_dict[track['clef']]}\nN_{instrument} "
+			for key, shift in zip(track['keys'], track['shift']):
+				if shift < 0:
+					result += (-shift * "-")
+				elif shift > 0:
+					result += (shift * "+")
+				result += keys_dict[key]
+				result += " 	"
+			result += f"\nT_{instrument} "
+			for time in track['times']:
+				if convert_modifier:
+					time = (time / modifier)
+				result += str(time)
+				result += " 	"
+			if not convert_modifier:
+				result += f"\nM_{instrument} {modifier}"
+			result += "\n\n"
 
 	return result
 

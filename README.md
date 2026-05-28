@@ -40,7 +40,7 @@ Check the [manual](man/man1/hrmidi.1.md) for more details.
 
 # Todo:
 ### Version 2:
-- Add support for pages (when one end, the other begins)
+- Fix new page mode to work on make_midi function
 - Avoid floating point
 ### Version 3:
 - Simultaneous notes with `(note note ...)`
