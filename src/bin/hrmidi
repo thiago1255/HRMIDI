@@ -774,7 +774,7 @@ def make_midi() -> bytes:
 	result += b"MThd"							# Header begin
 	result += (6).to_bytes(4, 'big')			# Header standard size
 	result += (1).to_bytes(2, 'big')			# Midi format, there is 0, 1 and 2
-	result += (len(source)).to_bytes(2, 'big')	# How many track chunks
+	result += (sum(len(x) for x in source[1:]) + 1).to_bytes(2, 'big')	# How many track chunks
 	result += (TICKS).to_bytes(2, 'big')		# Some timing stuff
 
 	result += mtrk([
@@ -785,10 +785,13 @@ def make_midi() -> bytes:
 	])
 
 	actual_offset:int = 0; next_offset:int = 0
+	print(source[1:])
 	for page in source[1:]:
+		print(page)
 		channels: dict = {}
 		actual_offset += next_offset
 		for track in page:
+			tmp_offset: int = 0
 			instrument: int = track['instrument'] - 1
 			
 			if instrument == 128:
@@ -811,7 +814,7 @@ def make_midi() -> bytes:
 			if channel == 9:
 				for k, t in zip(track['keys'], track['times']):
 					t = int(t * TICKS / track['modifier'])
-					next_offset += t
+					tmp_offset += t
 					if k == 0:
 						delay += t
 					else:
@@ -830,7 +833,7 @@ def make_midi() -> bytes:
 			else:
 				for k, s, t in zip(track['keys'], track['shift'], track['times']):
 					t = int(t * TICKS / track['modifier'])
-					next_offset += t
+					tmp_offset += t
 					if k == 0:
 						delay += t
 					else:
@@ -848,6 +851,7 @@ def make_midi() -> bytes:
 							,bytes([0])					# "velocity" - some instruments may act diferent with non 0
 						]
 						delay = 0
+			if tmp_offset > next_offset: next_offset = tmp_offset
 			result += mtrk(chunk)
 
 	return bytes(result)
