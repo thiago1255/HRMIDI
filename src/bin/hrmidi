@@ -7,7 +7,7 @@ import sys
 from argparse import ArgumentParser
 
 # - - - - - - - constants
-version: str = "1"
+version: str = "2"
 languages: tuple[str, ...] = ('pt', 'en', 'midi')
 keys = {
 	0:		0
@@ -596,7 +596,12 @@ def parse_hrmidi() -> list:
 				output *= BEAT_BASE
 			except:
 				try :
-					output = (int(s.split("/")[0]) * BEAT_BASE) / int(s.split("/")[1])
+					a, b  = int(s.split("/")[0]), int(s.split("/")[1])
+					a *= BEAT_BASE
+					if (a % b):
+						output = a / b
+					else:
+						output = a // b
 				except:
 					output = s
 		return output
