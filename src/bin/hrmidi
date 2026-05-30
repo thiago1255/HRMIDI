@@ -556,6 +556,8 @@ keys_alpha: dict = {
 
 page_names: tuple[str, ...] = ('pag', 'page', 'pagina')
 
+BEAT_BASE:int = 30 # The ammount of beats must be multiplied by this
+
 # - - - - - - - output functions
 def print_version():
 	print(f'hrmidi version: {version}')
@@ -580,6 +582,21 @@ def parse_hrmidi() -> list:
 			except:
 				try :
 					output = int(s.split("/")[0]) / int(s.split("/")[1])
+				except:
+					output = s
+		return output
+
+	def get_tempo(s: int) -> int | float | str:
+		try:
+			output = int(s)
+			output *= BEAT_BASE
+		except:
+			try:
+				output = float(s)
+				output *= BEAT_BASE
+			except:
+				try :
+					output = (int(s.split("/")[0]) * BEAT_BASE) / int(s.split("/")[1])
 				except:
 					output = s
 		return output
@@ -711,7 +728,7 @@ def parse_hrmidi() -> list:
 			instrument: str = items[0].replace('t_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			for time in items[1:]:
-				time = str_to_number(time)
+				time = get_tempo(time)
 				if isinstance(time, str): print_error(f"invalid time '{time}' at line {number}")
 				temp["times"].append(time)
 			step_t = True
@@ -767,15 +784,15 @@ def make_midi() -> bytes:
 		o += bytes([0xFF, 0x2F, 0x00]) # End of Track
 		return b"MTrk" + len(o).to_bytes(4, 'big') + o
 	
-	TICKS:int = 960
+	TICKS:int = 32 # To be multiplied by BEAT_BASE
 
 	result: bytearray = bytearray()
 
-	result += b"MThd"							# Header begin
-	result += (6).to_bytes(4, 'big')			# Header standard size
-	result += (1).to_bytes(2, 'big')			# Midi format, there is 0, 1 and 2
+	result += b"MThd"													# Header begin
+	result += (6).to_bytes(4, 'big')									# Header standard size
+	result += (1).to_bytes(2, 'big')									# Midi format, there is 0, 1 and 2
 	result += (sum(len(x) for x in source[1:]) + 1).to_bytes(2, 'big')	# How many track chunks
-	result += (TICKS).to_bytes(2, 'big')		# Some timing stuff
+	result += (TICKS * BEAT_BASE).to_bytes(2, 'big')					# Some timing stuff
 
 	result += mtrk([
 		vlq(0)																	# Deltatime
@@ -785,9 +802,7 @@ def make_midi() -> bytes:
 	])
 
 	actual_offset:int = 0; next_offset:int = 0
-	print(source[1:])
 	for page in source[1:]:
-		print(page)
 		channels: dict = {}
 		actual_offset += next_offset
 		for track in page:
@@ -919,7 +934,7 @@ def make_hr() -> str:
 			for time in track['times']:
 				if convert_modifier:
 					time = (time / modifier)
-				result += str(time)
+				result += str(time / BEAT_BASE)
 				result += " 	"
 			if not convert_modifier:
 				result += f"\nM_{instrument} {modifier}"
