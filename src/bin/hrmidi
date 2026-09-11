@@ -698,14 +698,26 @@ def parse_hrmidi() -> list:
 		if line.startswith("n_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
 			if step_n: print_error(f"duplicate and/or invalid keys section at line {number}")
-			
+			items = re.split(r'[;\s]+', line)
+			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
+			instrument: str = items[0].replace('n_', '')
+			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
+			if instruments[instrument] == 129:
+				if '(' in line or ')' in line: print_error(f"percurssion cannot have (), found at line {number}")
+				temp["keys"] = [[0] if i in ('0', '_') else [14] for i in items[1:]]
+				step_n = True
+				continue
+			del items
 			# ! manual parser begin !
 			items: list = []; t: str = ""; l: list = []; p: bool = False; e: bool = False
 			for c in line:
 				if c in (' ','	',';'):
 					if not e:
 						e = True
-						l.append(t); t = ""
+						if t:
+							l.append(t); t = ""
+							if not p:
+								items.append(l); l = []
 					continue
 				if c == '(':
 					if p:
@@ -718,9 +730,10 @@ def parse_hrmidi() -> list:
 				elif c == ')':
 					if not p:
 						print_error(f"no ( open at line {number} but ) was attempeted")
-					if not t:
-						t = '_' # Empty should give a pause
-					l.append(t); t = ""
+					if t:
+						l.append(t); t = ""
+					elif not l:
+						l.append('_') # Empty should give a pause
 					items.append(l); l = []
 					p = False
 				else:
@@ -731,14 +744,10 @@ def parse_hrmidi() -> list:
 			if l: items.append(l)
 			del t,l,p,e
 			# ! manual parser end !
-			
-			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
-			instrument: str = items[0][0].replace('n_', '')
-			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
-			if instruments[instrument] == 129:
-				temp["keys"] = [0 if i in ('0', '_') else 14 for i in items[1:]]
-			else:
-				for key in items[1:]:
+			for keys_list in items[1:]:
+				temp_keys = []
+				temp_shift = []
+				for key in keys_list:
 					k: str = f"{key}"
 					shift: int = (key.count('+') - key.count('-'))
 					key = key.replace('-', '').replace('+', '')
@@ -752,8 +761,14 @@ def parse_hrmidi() -> list:
 						key = 1
 						shift += 1
 					if 1 > (key + ((temp["clef"] + 5) * 12) + (shift * 12)) > 128: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
-					temp["keys"].append(key)
-					temp["shift"].append(shift)
+					if key != 0:
+						temp_keys.append(key)
+						temp_shift.append(shift)
+				if not temp_keys:
+					temp_keys = [0]
+					temp_shift = [0]
+				temp["keys"].append(temp_keys)
+				temp["shift"].append(temp_shift)
 			step_n = True
 			continue
 		if line.startswith("t_"):
