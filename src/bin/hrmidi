@@ -615,6 +615,42 @@ def parse_hrmidi() -> list:
 		if term == term_name or (not term): print_error(f'no {term_name} specified')
 		return term
 
+	def parse_times(number, items):
+		output = []
+		for time in items:
+			time = get_tempo(time)
+			if isinstance(time, str): print_error(f"invalid time '{time}' at line {number}")
+			output.append(time)
+		return output
+
+	def parse_percussion(items):
+		return [0 if i in ('0', '_') else 14 for i in items]
+
+	def parse_notes(number, keys_list):
+		temp_keys = []
+		temp_shift = []
+		for key in keys_list:
+			k: str = f"{key}"
+			shift: int = (key.count('+') - key.count('-'))
+			key = key.replace('-', '').replace('+', '')
+			if detected_dodeca: key = str_to_number(key)
+			if key not in keys.keys(): print_error(f"invalid key '{k}' at line {number}")
+			key = keys[key]
+			if key == -1: # Do♭
+				key = 12
+				shift -= 1
+			if key == 13: # Si♯
+				key = 1
+				shift += 1
+			if 1 > (key + ((temp["clef"] + 5) * 12) + (shift * 12)) > 128: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
+			if key != 0:
+				temp_keys.append(key)
+				temp_shift.append(shift)
+		if not temp_keys:
+			temp_keys = [0]
+			temp_shift = [0]
+		return (temp_keys, temp_shift)
+
 	lines: dict[int,str] = {number:valid for number,line in enumerate(file.split("\n"), start=1) if (valid := line.split("//")[0].strip().lower().replace(",", "."))}
 	
 	lang: str = get_term(lines, "lang")
@@ -704,7 +740,7 @@ def parse_hrmidi() -> list:
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			if instruments[instrument] == 129:
 				if '(' in line or ')' in line: print_error(f"percurssion cannot have (), found at line {number}")
-				temp["keys"] = [0 if i in ('0', '_') else 14 for i in items[1:]]
+				temp["keys"] = parse_percussion(items[1:])
 				step_n = True
 				continue
 			del items
@@ -745,28 +781,7 @@ def parse_hrmidi() -> list:
 			del t,l,p,e
 			# ! manual parser end !
 			for keys_list in items[1:]:
-				temp_keys = []
-				temp_shift = []
-				for key in keys_list:
-					k: str = f"{key}"
-					shift: int = (key.count('+') - key.count('-'))
-					key = key.replace('-', '').replace('+', '')
-					if detected_dodeca: key = str_to_number(key)
-					if key not in keys.keys(): print_error(f"invalid key '{k}' at line {number}")
-					key = keys[key]
-					if key == -1: # Do♭
-						key = 12
-						shift -= 1
-					if key == 13: # Si♯
-						key = 1
-						shift += 1
-					if 1 > (key + ((temp["clef"] + 5) * 12) + (shift * 12)) > 128: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
-					if key != 0:
-						temp_keys.append(key)
-						temp_shift.append(shift)
-				if not temp_keys:
-					temp_keys = [0]
-					temp_shift = [0]
+				temp_keys, temp_shift = parse_notes(number, keys_list)
 				temp["keys"].append(temp_keys)
 				temp["shift"].append(temp_shift)
 			step_n = True
@@ -779,10 +794,39 @@ def parse_hrmidi() -> list:
 			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
 			instrument: str = items[0].replace('t_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
-			for time in items[1:]:
-				time = get_tempo(time)
-				if isinstance(time, str): print_error(f"invalid time '{time}' at line {number}")
-				temp["times"].append(time)
+			temp["times"] = parse_times(number, items[1:])
+			step_t = True
+			continue
+		if line.startswith("nt_"):
+			if not step_c: print_error(f"line {number} does not have clef declaration above")
+			if step_n: print_error(f"duplicate and/or invalid keys section at line {number}")
+			if step_t: print_error(f"duplicate and/or invalid times section at line {number}")
+			items = re.split(r'[;\s]+', line.replace('\\', r' \ '))
+			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
+			instrument: str = items[0].replace('nt_', '')
+			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
+			if items[:-1]: print_error(f"line {number} finished with \\")
+			items.append('\\') # While lines shouldnt finish on \, we add this to avoid duplicated code below
+			p = (instruments[instrument] == 129)
+			open = False; values = []; notes = []; times = []
+			for item in items[1:]:
+				if item == '\\':
+					if not values: print_error(fr"new or duplicated \ opened at line {number} withowt previous subsection")
+					if len(values) < 2: print_error(fr"each subsection of \ need at least 2 arguments, line {number}")
+					times.append(values[:-1])
+					n = values[1:]
+					if p:
+						if len(n) > 1: print_error(f"line {number} (percurssion) cannot have more than 1 note per time")
+						notes.append(n[0])
+					else:
+						temp_keys, temp_shift = parse_notes(number, keys_list)
+						temp["keys"].append(temp_keys)
+						temp["shift"].append(temp_shift)
+				else:
+					values.append(item)
+			temp["times"] = parse_times(number, times)
+			if p: temp["keys"] = parse_percussion(notes)
+			step_n = True
 			step_t = True
 			continue
 		if line.startswith("m_"):
