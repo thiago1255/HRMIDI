@@ -41,4 +41,3 @@ Check the [manual](man/man1/hrmidi.1.md) for more details.
 # Todo:
 ### Version 3:
 - Allow to write many `N_` and `T_` at same tracks (make all `N_` follow the `T_` below ?)
-- Maybe alternative syntaxes with `[Note,Beats]`

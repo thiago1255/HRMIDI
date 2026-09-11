@@ -1021,7 +1021,7 @@ def make_hr() -> str:
 			modifier = track['modifier']
 			result += f"C_{instrument} {clefs_dict[track['clef']]}\n"
 			if single_mode:
-				result += "NT_{instrument}"
+				result += f"NT_{instrument}"
 				if not track['shift']: track['shift'] = [0] * len(track['keys'])
 				for kk, ss, time in zip(track['keys'], track['shift'], track['times']):
 					for key, shift in zip(kk, ss):
@@ -1036,9 +1036,9 @@ def make_hr() -> str:
 						time = (time / modifier)
 					result += str(time / BEAT_BASE)
 					result += ' \\'
-				result = [:-1]
+				result = result[:-1]
 			else:
-				result += "N_{instrument} "
+				result += f"N_{instrument} "
 				if track["instrument"] == 129:
 					for key in track['keys']:
 						result += keys_dict[key]
