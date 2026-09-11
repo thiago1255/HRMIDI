@@ -908,7 +908,7 @@ def make_midi() -> bytes:
 						delay += t
 					else:
 						real_keys: list = []
-						for kk, ss, zd in zip(k, s, len(k)):
+						for kk, ss, zd in zip(k, s, range(len(k))):
 							kk -= 1 # In midi they start at 0, not 1
 							kk += ((track['clef'] + 5) * 12) # Sets the clef
 							kk += (ss * 12) # Shift the clef
