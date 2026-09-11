@@ -712,7 +712,8 @@ def parse_hrmidi() -> list:
 						print_error(f"line {number} already have one ( open")
 					if t:
 						l.append(t); t = ""
-					items.append(l); l = []
+					if l:
+						items.append(l); l = []
 					p = True
 				elif c == ')':
 					if not p:
@@ -721,15 +722,13 @@ def parse_hrmidi() -> list:
 						t = '_' # Empty should give a pause
 					l.append(t); t = ""
 					items.append(l); l = []
+					p = False
 				else:
-					if e and t:
-						l.append(t); t = ""
-						items.append(l); l = []
 					t += c
 				e = False
 			if p: print_error(f"unclosed ( at line {number}")
-			l.append(t)
-			items.append(l)
+			if t: l.append(t)
+			if l: items.append(l)
 			del t,l,p,e
 			# ! manual parser end !
 			
