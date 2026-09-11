@@ -910,15 +910,11 @@ def make_midi() -> bytes:
 							kk += ((track['clef'] + 5) * 12) # Sets the clef
 							kk += (ss * 12) # Shift the clef
 							real_keys.append(kk)
-						chunk += [
-							vlq(delay)							# When the note will start, after previous event
-							,bytes([0x90 | channel])			# Note On Event
-							,*[bytes([kk]) for kk in real_keys]	# Note Value
-							,bytes([63])						# "velocity" - in pratice the volume
-							,vlq(t)								# When the note will end
-							,bytes([0x80 | channel])			# Note Off Event
-							,*[bytes([kk]) for kk in real_keys]	# Note Value
-							,bytes([0])							# "velocity" - some instruments may act diferent with non 0
+						chunk += [ # Read code some lines above for explanation on bytes meaning
+							vlq(delay)
+							,*(bytes(i) for kk in real_keys for i in ([0x90 | channel], [kk], [63]))
+							,vlq(t)
+							,*(bytes(i) for kk in real_keys for i in ([0x80 | channel], [kk], [0]))
 						]
 						delay = 0
 			if tmp_offset > next_offset: next_offset = tmp_offset
