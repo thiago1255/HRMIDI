@@ -36,6 +36,8 @@ Para mais informações sobre a linguagem ver **hrmidi(5)**.
 	Formato das claves: m (numérico) t (textual). Padrão: t
 	
 	Modificadores de tempo: k (Mantém os modificadores) c (Converte os tempos). Padrão: k
+	
+	Modo de Tempos/Notas: s (linha singular) d (linha dupla). Padrao: d
 
 **-o** *arquivo*
 :	Seleciona o nome do arquivo de saída. (O padrão é o nome de arquivo de entrada, sem extensões, seguido de .mid ou .*lingua*.hrmidi)

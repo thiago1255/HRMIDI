@@ -36,6 +36,8 @@ For more info on the language see **hrmidi(5)**.
 	Clefs format: m (numeric) t (text). Default: t
 	
 	Time modifiers: k (keep modifiers) c (converts the times). Default: k
+	
+	Notes/Keys mode: s (single line) d (dual line). Default: d
 
 **-o** *file*
 :	Sets the output file name. (The standard is input file name, withowt extensions, followed with .mid or .*language*.hrmidi)

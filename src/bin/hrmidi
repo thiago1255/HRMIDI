@@ -1008,6 +1008,7 @@ def make_hr() -> str:
 			clefs_dict |= {n:i for i, n in pt_percussion.items()}
 
 	convert_modifier: bool = ('c' in hrmidi_format)
+	single_mode: bool = ('s' in hrmidi_format)
 
 	first_page = True
 	for page in source[1:]:
@@ -1018,37 +1019,56 @@ def make_hr() -> str:
 		for track in page:
 			instrument: str = instruments_dict[track["instrument"]].upper()
 			modifier = track['modifier']
-			result += f"C_{instrument} {clefs_dict[track['clef']]}\nN_{instrument} "
-			if track["instrument"] == 129:
-				for key in track['keys']:
-					result += keys_dict[key]
-					result += " 	"
-			else:
-				for kk, ss in zip(track['keys'], track['shift']):
-					if len(kk) == 1:
-						key = kk[0]; shift = ss[0]
+			result += f"C_{instrument} {clefs_dict[track['clef']]}\n"
+			if single_mode:
+				result += "NT_{instrument}"
+				if not track['shift']: track['shift'] = [0] * len(track['keys'])
+				for kk, ss, time in zip(track['keys'], track['shift'], track['times']):
+					for key, shift in zip(kk, ss):
+						result += " "
 						if shift < 0:
 							result += (-shift * "-")
 						elif shift > 0:
 							result += (shift * "+")
+						result += keys_dict[key]
+					result += ';'
+					if convert_modifier:
+						time = (time / modifier)
+					result += str(time / BEAT_BASE)
+					result += ' \\'
+				result = [:-1]
+			else:
+				result += "N_{instrument} "
+				if track["instrument"] == 129:
+					for key in track['keys']:
 						result += keys_dict[key]
 						result += " 	"
-						continue
-					result += "("
-					for key, shift in zip(kk, ss):
-						if shift < 0:
-							result += (-shift * "-")
-						elif shift > 0:
-							result += (shift * "+")
-						result += keys_dict[key]
-						result += ';'
-					result = result[:-1] + ")	"
-			result += f"\nT_{instrument} "
-			for time in track['times']:
-				if convert_modifier:
-					time = (time / modifier)
-				result += str(time / BEAT_BASE)
-				result += " 	"
+				else:
+					for kk, ss in zip(track['keys'], track['shift']):
+						if len(kk) == 1:
+							key = kk[0]; shift = ss[0]
+							if shift < 0:
+								result += (-shift * "-")
+							elif shift > 0:
+								result += (shift * "+")
+							result += keys_dict[key]
+							result += " 	"
+							continue
+						result += "("
+						for key, shift in zip(kk, ss):
+							if shift < 0:
+								result += (-shift * "-")
+							elif shift > 0:
+								result += (shift * "+")
+							result += keys_dict[key]
+							result += ';'
+						result = result[:-1] + ")	"
+				result += f"\nT_{instrument} "
+				for time in track['times']:
+					if convert_modifier:
+						time = (time / modifier)
+					result += str(time / BEAT_BASE)
+					result += " 	"
 			if not convert_modifier:
 				result += f"\nM_{instrument} {modifier}"
 			result += "\n\n"
