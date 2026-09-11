@@ -913,7 +913,7 @@ def make_midi() -> bytes:
 							kk += (ss * 12) # Shift the clef
 							real_keys.append((bytes([kk]), bool(zd))) # zd means zero delay for symultaneous notes
 						chunk += [
-							,*(i for kk, zd in real_keys for i in (vlq(0 if zd else delay), NOTE_ON, kk, bytes([63])))
+							*(i for kk, zd in real_keys for i in (vlq(0 if zd else delay), NOTE_ON, kk, bytes([63])))
 							,*(i for kk, zd in real_keys for i in (vlq(0 if zd else t), NOTE_OFF, kk, bytes([0])))
 						]
 						delay = 0
