@@ -698,10 +698,43 @@ def parse_hrmidi() -> list:
 		if line.startswith("n_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
 			if step_n: print_error(f"duplicate and/or invalid keys section at line {number}")
-			items = re.split(r'[;\s]+', line)
-			if not items[-1]: items.pop()
+			
+			# ! manual parser begin !
+			items: list = []; t: str = ""; l: list = []; p: bool = False; e: bool = False
+			for c in line:
+				if c in (' ','	',';'):
+					if not e:
+						e = True
+						l.append(t); t = ""
+					continue
+				if c == '(':
+					if p:
+						print_error(f"line {number} already have one ( open")
+					if t:
+						l.append(t); t = ""
+					items.append(l); l = []
+					p = True
+				elif c == ')':
+					if not p:
+						print_error(f"no ( open at line {number} but ) was attempeted")
+					if not t:
+						t = '_' # Empty should give a pause
+					l.append(t); t = ""
+					items.append(l); l = []
+				else:
+					if e and t:
+						l.append(t); t = ""
+						items.append(l); l = []
+					t += c
+				e = False
+			if p: print_error(f"unclosed ( at line {number}")
+			l.append(t)
+			items.append(l)
+			del t,l,p,e
+			# ! manual parser end !
+			
 			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
-			instrument: str = items[0].replace('n_', '')
+			instrument: str = items[0][0].replace('n_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			if instruments[instrument] == 129:
 				temp["keys"] = [0 if i in ('0', '_') else 14 for i in items[1:]]
