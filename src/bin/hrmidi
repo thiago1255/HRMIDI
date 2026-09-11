@@ -704,7 +704,7 @@ def parse_hrmidi() -> list:
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			if instruments[instrument] == 129:
 				if '(' in line or ')' in line: print_error(f"percurssion cannot have (), found at line {number}")
-				temp["keys"] = [[0] if i in ('0', '_') else [14] for i in items[1:]]
+				temp["keys"] = [0 if i in ('0', '_') else 14 for i in items[1:]]
 				step_n = True
 				continue
 			del items
@@ -901,21 +901,24 @@ def make_midi() -> bytes:
 				for k, s, t in zip(track['keys'], track['shift'], track['times']):
 					t = int(t * TICKS / track['modifier'])
 					tmp_offset += t
-					if k == 0:
+					if k == [0]:
 						delay += t
 					else:
-						k -= 1 # In midi they start at 0, not 1
-						k += ((track['clef'] + 5) * 12) # Sets the clef
-						k += (s * 12) # Shift the clef
+						real_keys: list = []
+						for kk, ss in zip(k, s):
+							kk -= 1 # In midi they start at 0, not 1
+							kk += ((track['clef'] + 5) * 12) # Sets the clef
+							kk += (ss * 12) # Shift the clef
+							real_keys.append(kk)
 						chunk += [
-							vlq(delay)					# When the note will start, after previous event
-							,bytes([0x90 | channel])	# Note On Event
-							,bytes([k])					# Note Value
-							,bytes([63])				# "velocity" - in pratice the volume
-							,vlq(t)						# When the note will end
-							,bytes([0x80 | channel])	# Note Off Event
-							,bytes([k])					# Note Value
-							,bytes([0])					# "velocity" - some instruments may act diferent with non 0
+							vlq(delay)							# When the note will start, after previous event
+							,bytes([0x90 | channel])			# Note On Event
+							,*[bytes([kk]) for kk in real_keys]	# Note Value
+							,bytes([63])						# "velocity" - in pratice the volume
+							,vlq(t)								# When the note will end
+							,bytes([0x80 | channel])			# Note Off Event
+							,*[bytes([kk]) for kk in real_keys]	# Note Value
+							,bytes([0])							# "velocity" - some instruments may act diferent with non 0
 						]
 						delay = 0
 			if tmp_offset > next_offset: next_offset = tmp_offset
