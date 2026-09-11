@@ -805,7 +805,7 @@ def parse_hrmidi() -> list:
 			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
 			instrument: str = items[0].replace('nt_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
-			if items[:-1]: print_error(f"line {number} finished with \\")
+			if items[:-1] == '\\': print_error(f"line {number} finished with \\")
 			items.append('\\') # While lines shouldnt finish on \, we add this to avoid duplicated code below
 			p = (instruments[instrument] == 129)
 			open = False; values = []; notes = []; times = []
@@ -813,15 +813,16 @@ def parse_hrmidi() -> list:
 				if item == '\\':
 					if not values: print_error(fr"new or duplicated \ opened at line {number} withowt previous subsection")
 					if len(values) < 2: print_error(fr"each subsection of \ need at least 2 arguments, line {number}")
-					times.append(values[:-1])
-					n = values[1:]
+					times.append(values[-1])
+					n = values[:-1]
 					if p:
-						if len(n) > 1: print_error(f"line {number} (percurssion) cannot have more than 1 note per time")
+						if len(n) > 1: print_error(f"line {number} (percussion) cannot have more than 1 note per time")
 						notes.append(n[0])
 					else:
-						temp_keys, temp_shift = parse_notes(number, keys_list)
+						temp_keys, temp_shift = parse_notes(number, n)
 						temp["keys"].append(temp_keys)
 						temp["shift"].append(temp_shift)
+					values = []
 				else:
 					values.append(item)
 			temp["times"] = parse_times(number, times)
