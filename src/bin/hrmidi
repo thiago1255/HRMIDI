@@ -835,8 +835,6 @@ def make_midi() -> bytes:
 		o += vlq(0)
 		o += bytes([0xFF, 0x2F, 0x00]) # End of Track
 		return b"MTrk" + len(o).to_bytes(4, 'big') + o
-	NOTE_ON = bytes([0x90 | channel])
-	NOTE_OFF = bytes([0x80 | channel])
 	
 	TICKS:int = 32 # To be multiplied by BEAT_BASE
 
@@ -878,6 +876,9 @@ def make_midi() -> bytes:
 				,bytes([0xC0 | channel])
 				,bytes([instrument])
 			]
+
+			NOTE_ON = bytes([0x90 | channel])
+			NOTE_OFF = bytes([0x80 | channel])
 	
 			delay: int = actual_offset
 			if channel == 9:
