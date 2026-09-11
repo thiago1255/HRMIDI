@@ -971,17 +971,33 @@ def make_hr() -> str:
 		else:
 			result += "PAG\n\n"
 		for track in page:
-			if not track['shift']: track['shift'] = [0] * len(track['keys'])
 			instrument: str = instruments_dict[track["instrument"]].upper()
 			modifier = track['modifier']
 			result += f"C_{instrument} {clefs_dict[track['clef']]}\nN_{instrument} "
-			for key, shift in zip(track['keys'], track['shift']):
-				if shift < 0:
-					result += (-shift * "-")
-				elif shift > 0:
-					result += (shift * "+")
-				result += keys_dict[key]
-				result += " 	"
+			if track["instrument"] == 129:
+				for key in track['keys']:
+					result += keys_dict[key]
+					result += " 	"
+			else:
+				for kk, ss in zip(track['keys'], track['shift']):
+					if len(kk) == 1:
+						key = kk[0]; shift = ss[0]
+						if shift < 0:
+							result += (-shift * "-")
+						elif shift > 0:
+							result += (shift * "+")
+						result += keys_dict[key]
+						result += " 	"
+						continue
+					result += "("
+					for key, shift in zip(kk, ss):
+						if shift < 0:
+							result += (-shift * "-")
+						elif shift > 0:
+							result += (shift * "+")
+						result += keys_dict[key]
+						result += ';'
+					result = result[:-1] + ")	"
 			result += f"\nT_{instrument} "
 			for time in track['times']:
 				if convert_modifier:
