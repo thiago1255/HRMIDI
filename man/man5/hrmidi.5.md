@@ -1,4 +1,4 @@
-% hrmidi(5) v1 | Manual of the hrmidi language
+% hrmidi(5) v3 | Manual of the hrmidi language
 % thiago1255
 % 2026
 
@@ -68,14 +68,23 @@ The terms are written with the letter + underline + instrument name, ex: `C_PIAN
 	
 	To write the key one clef above or below, must use `+` or `-` (being cumulative) before the key, without split.
 	
+	In order to write simultaneous keys (chords), parentheses are used, like in `(do re)`. Empty parentheses are considered breaks.
+	
 	With dodecaphonic mode enabled, numbers notes will be read from 1-12, an attemp to write sharp/flat on a number will result in being read as the "numeric" (non dodecaphonic) mode previously cited.
 	
 	They keys are limited from 0 to 127, this is, from "Do at clef -5" to "Sol at clef 5"
 
-**T** *time* (Mandatory)
+**T** *times* (Mandatory)
 :	Sets the duration of each key or break from the keys line - how many beats. Must have the same amount of items as the keys line.
 
 	Each duration can be written with decimal or integer numbers.
+
+**NT** *keys times* (Alternative syntax for **N** and **T**)
+:	Way to write notes and times in a single line, parts split by backslash, however line cannot be finished using a `\`.
+
+	Each part must have a note and a time.
+	
+	In order to write simultaneous keys, parentheses should not be used, instead they are put in a part, the last item of a part will always be read as the time.
 
 **M** *number* [Optional]
 :	Time modifier for the track, each duration is divided by this number.
@@ -213,7 +222,7 @@ The available instruments on midi are:
 127. applause
 128. gunshot
 
-You can only use the maximum of 15 of the instruments above in the same file, and any number of percussions.
+You can only use the maximum of 15 of the instruments above in the same page, and any number of percussions.
 
 To use percussion, you must use the `percussion` normally as instrument, but specify the type where the clef would be written, the available are:
 
@@ -265,7 +274,7 @@ To use percussion, you must use the `percussion` normally as instrument, but spe
 - triangle-mute
 - triangle-open
 
-On notes section of percussions, any text will be interpreted as a beat, except for the `0` and `_` than mean "no sound".
+On notes section of percussions, any text will be interpreted as a beat, except for the `0` and `_` than mean "no sound". Parentheses can not be written here.
 
 # SEE ALSO
 

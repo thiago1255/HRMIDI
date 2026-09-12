@@ -1,4 +1,4 @@
-% hrmidi(5) v1 | Manual da linguagem hrmidi
+% hrmidi(5) v3 | Manual da linguagem hrmidi
 % thiago1255
 % 2026
 
@@ -68,14 +68,23 @@ Os termos são escritos com a letra + underline + nome do instrumento, ex: `C_VI
 	
 	Para escrever a nota uma clave acima ou abaixo, usa-se `+` ou `-` (podendo ser cumulativo) respectivamente antes da nota, sem separação.
 	
+	Para escrever notas simultaneas (acordes), basta usar parênteses, como em `(do re)`. Parênteses vazios serão considerados pausas.
+	
 	Com o modo dodecafonico ligado, as notas númericas serão lidas de 1-12, escrever números com sustenido/bemol resultará em eles serem interpretados no modo númerico citado anteriormente (não dodecafonico).
 	
 	O limite das notas é de 0 até 127, ou seja, de "Dó na clave -5" até "Sol na clave 5".
 
-**T** *tempo* (Obrigatório)
+**T** *tempos* (Obrigatório)
 :	Define o tempo de cada nota ou pausa da linha das notas - quantas batidas ela vale. Deve ter a mesma quantidade de itens que a linha de notas.
 
 	Cada tempo pode ser representado com um número inteiro ou decimal.
+
+**NT** *notas tempo* (Sintaxe alternativa para **N** e **T**)
+:	Modo de escrever notas e tempo numa mesma linha, partes separadas por barra invertida, não podendo finalizar a linha com `\` entretanto.
+
+	Cada parte deve conter uma nota e um tempo.
+	
+	Nesse modo notas simultaneas não são escritas com parênteses, ao invez disso são colocadas numa parte, o último item de uma parte sempre será lido como o tempo.
 
 **M** *número* [Opcional]
 :	Modificador do tempo, multiplica-se a velocidade pelo número aqui declarado. Ex: Mudar para "2" vai fazer os tempos "1" virarem "0,5".
@@ -213,7 +222,7 @@ Os instrumentos disponiveis em midi são:
 127. aplausos
 128. tiro
 
-Só se pode usar no máximo 15 dos instrumentos acima no mesmo arquivo, e qualquer número de percussões.
+Só se pode usar no máximo 15 dos instrumentos acima na mesma pagina, e qualquer número de percussões.
 
 Para usar percussão, deve-se usar `percussao` assim como qualquer instrumento, mas onde seria a clave, colocar o tipo, estão disponíveis:
 
@@ -265,7 +274,7 @@ Para usar percussão, deve-se usar `percussao` assim como qualquer instrumento, 
 - triangulo-abafado
 - triangulo-aberto
 
-Na parte das notas das percussões, qualquer texto vai ser interpretado como uma batida, com exceção de `0` e `_` que significam pausas.
+Na parte das notas das percussões, qualquer texto vai ser interpretado como uma batida, com exceção de `0` e `_` que significam pausas. Parênteses não podem ser usados aqui.
 
 # VER TAMBÉM
 
