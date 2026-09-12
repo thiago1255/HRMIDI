@@ -1097,6 +1097,7 @@ if __name__ == "__main__":
 	parser.add_argument('-f', metavar='format', default=None, help='The formating for non midi output.')
 	parser.add_argument('-o', metavar='output_file', default=None, help='The name of output file.')
 	parser.add_argument('--stdout', action='store_true', help='Outputs to stdout instead file.')
+	parser.add_argument('--debug', action='store_true', help='Prints the processed data by parser.')
 	parser.add_argument('file', help='Name of the input file.')
 
 	args = parser.parse_args()
@@ -1106,12 +1107,13 @@ if __name__ == "__main__":
 	except FileNotFoundError:
 		print(f"hrmidi: file '{args.file}' not found.")
 		sys.exit(1)
-	language, hrmidi_format, output, stdout = args.l, args.f, args.o, args.stdout
+	language, hrmidi_format, output, stdout, debug = args.l, args.f, args.o, args.stdout, args.debug
 	if not output: output = os.path.splitext(os.path.basename(args.file))[0]
 	del parser, args
 
 	source: dict = parse_hrmidi()
 	del file
+	if debug: print(source)
 	if language == 'midi':
 		output += ".mid"
 		result: bytes = make_midi()

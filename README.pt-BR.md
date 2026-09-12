@@ -31,7 +31,8 @@ A linguagem tem algumas regras:
 Por ora, haverá apenas o comando `hrmidi` para compilar, ou para converter para outra linguagem.
 
 Não requer instalação ou compilação, o script em `src/bin/hrmidi` pode ser executado sozinho.
-Para instalar as *páginas do man* rode `convert-man-pages.sh`.
+
+Para instalar as *páginas do man* rode `convert-man-pages.sh`, precisa do *pandoc* instalado.
 
 Veja o [manual](man/pt_BR/man1/hrmidi.1.md) para mais detalhes.
 

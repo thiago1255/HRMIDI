@@ -34,10 +34,12 @@ The language have some rules:
 For now there will be only the `hrmidi` command to compile or convert to another language/type.
 
 There is no need to install or compile, you can simply run the script `src/bin/hrmidi`.
-In order to install the *man pages*, run the script `convert-man-pages.sh` before.
+
+In order to install the *man pages*, run the script `convert-man-pages.sh` before, *pandoc* need to be installed.
 
 Check the [manual](man/man1/hrmidi.1.md) for more details.
 
 # Todo:
-### Version 3:
-- Allow to write many `N_` and `T_` at same tracks (make all `N_` follow the `T_` below ?)
+### Version 4:
+- pkg generator
+- text replace
