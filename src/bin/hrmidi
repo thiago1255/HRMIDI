@@ -729,7 +729,7 @@ def parse_hrmidi() -> list:
 					if clef not in clefs.keys(): print_error(f"invalid clef name at line {number}")
 					clef = clefs[clef]
 				if -5 > clef > 5: print_error(f"invalid clef at line {number} (limit is from -5 to 5)")
-			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "keys": [], "shift": [], "times": []}
+			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "keys": [], "times": [], "shift": [], "subtrack": []}
 			continue
 		if line.startswith("n_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
@@ -785,7 +785,7 @@ def parse_hrmidi() -> list:
 				temp["keys"].append(temp_keys)
 				temp["shift"].append(temp_shift)
 			step_n = True
-			step_t = False
+			step_t = False # Added so many T and N can be written at the same track
 			continue
 		if line.startswith("t_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
@@ -796,12 +796,15 @@ def parse_hrmidi() -> list:
 			instrument: str = items[0].replace('t_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			temp["times"] = parse_times(number, items[1:])
-			step_t = True
+			if len(temp['keys']) != len(temp['times']): print_error(f"line {number} dont have the same ammount of items as the key line above")
+			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift']))
+			temp["keys"] = []; temp['times'] = []; temp['shift'] = []
+			step_t = True # This is important to see if a track is complete
+			step_n = False # Added so many T and N can be written at the same track
 			continue
 		if line.startswith("nt_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
 			if step_n: print_error(f"duplicate and/or invalid keys section at line {number}")
-			if step_t: print_error(f"duplicate and/or invalid times section at line {number}")
 			items = re.split(r'[;\s]+', line.replace('\\', r' \ '))
 			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
 			instrument: str = items[0].replace('nt_', '')
@@ -828,8 +831,9 @@ def parse_hrmidi() -> list:
 					values.append(item)
 			temp["times"] = parse_times(number, times)
 			if p: temp["keys"] = parse_percussion(notes)
-			step_n = True
-			step_t = True
+			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift']))
+			temp["keys"] = []; temp['times'] = []; temp['shift'] = []
+			step_t = True # This is important to see if a track is complete
 			continue
 		if line.startswith("m_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
@@ -847,11 +851,13 @@ def parse_hrmidi() -> list:
 			continue
 		if line.strip() in page_names:
 			if not step_c: print_error(f"new page started at line {number}, but previous didnt had any track")
-			if not step_n: print_error(f"new page started at line {number} withowt finish the previous track (missing at least keys section)")
-			if not step_t: print_error(f"new page started at line {number} withowt finish the previous track (missing time section)")
-			if len(temp['keys']) != len(temp['times']): print_error(f"track above line {number} have different number of keys and times")
+			if not step_t: print_error(f"new page started at line {number} withowt finish the previous track (missing at least time section)")
 			temp["instrument"] = instruments[temp["instrument"]]
-			page.append(temp)
+			for subtrack in temp['subtrack']:
+				page.append({
+					'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'],
+					"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2]
+				})
 			source.append(page)
 			temp = {}; page = []
 			step_c, step_n, step_t, step_m, detected_dodeca = False, False, False, False, False
@@ -859,11 +865,14 @@ def parse_hrmidi() -> list:
 		print_error(f'unknow instruction at line {number}')
 	
 	if not step_c: print_error(f"no tracks found on last page")
-	if not step_n: print_error(f"last track missing at least keys section")
-	if not step_t: print_error(f"last track missing time section")
+	if not step_t: print_error(f"last track missing at least time section")
 	if len(temp['keys']) != len(temp['times']): print_error(f"last track have different number of keys and times")
 	temp["instrument"] = instruments[temp["instrument"]]
-	page.append(temp)
+	for subtrack in temp['subtrack']:
+		page.append({
+			'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'],
+			"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2]
+		})
 	source.append(page)
 	return source
 
