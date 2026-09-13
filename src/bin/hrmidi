@@ -707,9 +707,12 @@ def parse_hrmidi() -> list:
 		if line.startswith("c_"):
 			if step_c:
 				if not step_t: print_error(f"new track started at line {number} withowt finish the previous")
-				if len(temp['keys']) != len(temp['times']): print_error(f"track above line {number} have different number of keys and times")
 				temp["instrument"] = instruments[temp["instrument"]]
-				page.append(temp)
+				for subtrack in temp['subtrack']:
+					page.append({
+						'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'],
+						"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2]
+					})
 				step_c, step_n, step_t, step_m = False, False, False, False
 			step_c = True
 			items = re.split(r'[;\s]+', line)
