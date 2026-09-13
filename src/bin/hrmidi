@@ -912,6 +912,7 @@ def make_midi() -> bytes:
 	for page in source[1:]:
 		channels: dict = {}
 		actual_offset += next_offset
+		next_offset = 0
 		for track in page:
 			tmp_offset: int = 0
 			instrument: int = track['instrument'] - 1
