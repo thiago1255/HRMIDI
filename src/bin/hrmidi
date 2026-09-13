@@ -706,8 +706,7 @@ def parse_hrmidi() -> list:
 		
 		if line.startswith("c_"):
 			if step_c:
-				if not step_n: print_error(f"new track started at line {number} withowt finish the previous (missing at least keys section)")
-				if not step_t: print_error(f"new track started at line {number} withowt finish the previous (missing time section)")
+				if not step_t: print_error(f"new track started at line {number} withowt finish the previous")
 				if len(temp['keys']) != len(temp['times']): print_error(f"track above line {number} have different number of keys and times")
 				temp["instrument"] = instruments[temp["instrument"]]
 				page.append(temp)
