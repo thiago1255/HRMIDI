@@ -43,3 +43,4 @@ Check the [manual](man/man1/hrmidi.1.md) for more details.
 ### Version 4:
 - pkg generator
 - text replace
+- maybe: volume control

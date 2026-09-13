@@ -52,14 +52,16 @@ Define uma trilha de um instrumento, deve ser declarada começando com a clave.
 
 Os termos são escritos com a letra + underline + nome do instrumento, ex: `C_VIOLINO`.
 
+As trilhas devem ter: exatamente 1 `C_`; mínimo de 1 `N_` seguido de 1 `T_`, ou 1 `NT_`, podendo usar ambos numa mesma trilha; opcionalmente 1 `M_`.
+
 **C** *clave* (Obrigatório)
 :	Define a clave da trilha. Pode ser escrita com número inteiro ou em forma de texto:
-	
+
 	Claves disponíveis: Fa = -1, Sol = 0, Do = 1. Outros números inteiros podem usados além desses, o limite vai de -5 a 5.
 
 **N** *notas* (Obrigatório)
 :	Define cada nota e pausa da trilha, cada uma deve ser separada seguindo a *formatação* descrita na seção **DESCRIÇÃO**.
-	
+
 	Pausas podem ser escritas usando `0` ou `_`.
 	
 	Notas podem ser escritas numericamente, foneticamente ou alfabeticamente: do = 1 = C, re = 2 = D, mi = 3 = E, fa = 4 = F, sol = 5 = G, la = 6 = A, si = 7 = B = H.
@@ -75,7 +77,7 @@ Os termos são escritos com a letra + underline + nome do instrumento, ex: `C_VI
 	O limite das notas é de 0 até 127, ou seja, de "Dó na clave -5" até "Sol na clave 5".
 
 **T** *tempos* (Obrigatório)
-:	Define o tempo de cada nota ou pausa da linha das notas - quantas batidas ela vale. Deve ter a mesma quantidade de itens que a linha de notas.
+:	Define o tempo de cada nota ou pausa da linha das notas - quantas batidas ela vale. Deve ter a mesma quantidade de itens que a linha de notas, que deve estar acima desta.
 
 	Cada tempo pode ser representado com um número inteiro ou decimal.
 

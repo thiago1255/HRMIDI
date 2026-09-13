@@ -52,14 +52,16 @@ Sets a track for an instrument, the declaration must start with the clef.
 
 The terms are written with the letter + underline + instrument name, ex: `C_PIANO`.
 
+The tracks must have: exactly 1 `C_`; minimum of 1 `N_` followed by 1 `T_`, or 1 `NT_`, where both can be used in the same track; optionally 1 `M_`.
+
 **C** *clef* (Mandatory)
 :	Sets the clef of this track. Can be written with number or using textual mode:
-	
+
 	Available clefs: Bass = -1, Treble = 0, Alto = Tenor = 1. Other integer numbers can be used besides those, the limit is from -5 to 5.
 
 **N** *keys* (Mandatory)
 :	Sets each key and break of the track, each one must be split using the *Formatting* described on section **DESCRIPTION**.
-	
+
 	Breaks must be declared using `0` or `_`.
 	
 	Keys can be written phonetically, numerically or alphabetically: do = 1 = C, re = 2 = D, mi = 3 = E, fa = 4 = F, sol = 5 = G, la = 6 = A, si = 7 = B = H.
@@ -75,7 +77,7 @@ The terms are written with the letter + underline + instrument name, ex: `C_PIAN
 	They keys are limited from 0 to 127, this is, from "Do at clef -5" to "Sol at clef 5"
 
 **T** *times* (Mandatory)
-:	Sets the duration of each key or break from the keys line - how many beats. Must have the same amount of items as the keys line.
+:	Sets the duration of each key or break from the keys line - how many beats. Must have the same amount of items as the keys line, which must be above this.
 
 	Each duration can be written with decimal or integer numbers.
 

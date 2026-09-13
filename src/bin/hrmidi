@@ -7,7 +7,7 @@ import sys
 from argparse import ArgumentParser
 
 # - - - - - - - constants
-version: str = "2"
+version: str = "3"
 languages: tuple[str, ...] = ('pt', 'en', 'midi')
 keys = {
 	0:		0
@@ -706,7 +706,7 @@ def parse_hrmidi() -> list:
 		
 		if line.startswith("c_"):
 			if step_c:
-				if not step_t: print_error(f"new track started at line {number} withowt finish the previous")
+				if not step_t: print_error(f"new track started at line {number} without finish the previous")
 				temp["instrument"] = instruments[temp["instrument"]]
 				for subtrack in temp['subtrack']:
 					page.append({
@@ -817,7 +817,7 @@ def parse_hrmidi() -> list:
 			open = False; values = []; notes = []; times = []
 			for item in items[1:]:
 				if item == '\\':
-					if not values: print_error(fr"new or duplicated \ opened at line {number} withowt previous subsection")
+					if not values: print_error(fr"new or duplicated \ opened at line {number} without previous subsection")
 					if len(values) < 2: print_error(fr"each subsection of \ need at least 2 arguments, line {number}")
 					times.append(values[-1])
 					n = values[:-1]
@@ -853,7 +853,7 @@ def parse_hrmidi() -> list:
 			continue
 		if line.strip() in page_names:
 			if not step_c: print_error(f"new page started at line {number}, but previous didnt had any track")
-			if not step_t: print_error(f"new page started at line {number} withowt finish the previous track (missing at least time section)")
+			if not step_t: print_error(f"new page started at line {number} without finish the previous track (missing at least time section)")
 			temp["instrument"] = instruments[temp["instrument"]]
 			for subtrack in temp['subtrack']:
 				page.append({
