@@ -26,9 +26,10 @@ The language have some rules:
 - The terms/keys must be split with *space* ` `, *tabs* `	` and/or semicolons `;`. The number used between two different keys does not matter, this is for formating reasons;
 - Lines must be split using `\n` (new line);
 - Empty lines will be ignored, you can use them for formating.
-- Keys/terms can be written in lowercase or uppercase, and even mix both.
+- Keys/terms can be written in lowercase or uppercase, and even mix both;
+- Chords can be written using parentheses, like in `do (re mi fa) sol la` which will result in "4" notes.
 
-**For full technical description check the [manual pages](man/man5/hrmidi.5.md).**
+**For full technical description and other syntaxes check the [manual pages](man/man5/hrmidi.5.md).**
 
 # The program:
 For now there will be only the `hrmidi` command to compile or convert to another language/type.
@@ -41,6 +42,7 @@ Check the [manual](man/man1/hrmidi.1.md) for more details.
 
 # Todo:
 ### Version 4:
-- pkg generator
-- text replace
-- maybe: volume control
+- pkg generator (to install on arch based distros)
+- text replace (probably argument on compiler)
+- maybe: volume control (speed only, or channel volume ?)
+3

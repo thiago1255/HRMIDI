@@ -24,8 +24,9 @@ A linguagem tem algumas regras:
 - As linhas devem separadas usando `\n` (nova linha);
 - Pode-se usar linhas vazias para formatação.
 - Os termos/notas podem ser escritos em caixa alta, baixa ou ambas.
+- Acordes podem ser escritos usando parênteses, como em `do (re mi fa) sol la` onde o resultado será "4" notas.
 
-**Para detalhes técnicos completos, verifique o [manual](man/pt_BR/man5/hrmidi.5.md) da linguagem.**
+**Para detalhes técnicos completos, e outras sintaxes, verifique o [manual](man/pt_BR/man5/hrmidi.5.md) da linguagem.**
 
 # O programa:
 Por ora, haverá apenas o comando `hrmidi` para compilar, ou para converter para outra linguagem.
