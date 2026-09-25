@@ -930,7 +930,7 @@ def make_midi() -> bytes:
 				channel = channels[instrument]
 	
 			chunk: list[bytes] = [
-				vlq(0)
+				vlq(actual_offset)
 				,bytes([0xC0 | channel])
 				,bytes([instrument])
 			]
@@ -938,7 +938,7 @@ def make_midi() -> bytes:
 			NOTE_ON = bytes([0x90 | channel])
 			NOTE_OFF = bytes([0x80 | channel])
 	
-			delay: int = actual_offset
+			delay: int = 0
 			if channel == 9:
 				for k, t in zip(track['keys'], track['times']):
 					t = int(t * TICKS / track['modifier'])
