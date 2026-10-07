@@ -642,7 +642,7 @@ def parse_hrmidi() -> list:
 			if key == 13: # Si♯
 				key = 1
 				shift += 1
-			if 1 > (key + ((temp["clef"] + 5) * 12) + (shift * 12)) > 128: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
+			if not 1 <= (key + ((temp["clef"] + 5) * 12) + (shift * 12)) <= 127: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
 			if key != 0:
 				temp_keys.append(key)
 				temp_shift.append(shift)
@@ -678,42 +678,42 @@ def parse_hrmidi() -> list:
 		print_warning('no version specified on file')
 	
 	source: list = [bpm]; page: list = []
-	detected_lang: bool = False; detected_bpm: bool = False; detected_ver: bool = False; detected_dodeca = False
-	step_c: bool = False; step_n: bool = False; step_t: bool = False; step_m: bool = False
-	instruments_used: set = set()
+	detected_lang: bool = False; detected_bpm: bool = False; detected_ver: bool = False; detected_dodeca: bool = False
+	step_c: bool = False; step_n: bool = False; step_t: bool = False; step_m: bool = False; step_v: bool = False
+	instruments_used: set = set(); vel = 63
 	temp: dict = {}
 	for number, line in lines.items():
 		if line.startswith("lang"):
-			if detected_lang:
-				print_error(f"duplicated lang at line {number}")
-			else:
-				detected_lang = True; continue
+			if detected_lang: print_error(f"duplicated lang at line {number}")
+			detected_lang = True; continue
 		if line.startswith("bpm"):
-			if detected_bpm:
-				print_error(f"duplicated bpm at line {number}")
-			else:
-				detected_bpm = True; continue
+			if detected_bpm: print_error(f"duplicated bpm at line {number}")
+			detected_bpm = True; continue
 		if line.startswith("ver"):
-			if detected_ver:
-				print_error(f"duplicated ver at line {number}")
-			else:
-				detected_ver = True; continue
+			if detected_ver: print_error(f"duplicated ver at line {number}")
+			detected_ver = True; continue
+		if line.startswith("vel"):
+			items = re.split(r'[;\s]+', line)
+			if not items[-1]: items.pop()
+			if len(items) != 2: print_error(f"invalid arguments number at line {number} (must be two)")
+			vel = str_to_number(items[1])
+			if not isinstance(vel, int): print_error(f"velocity at line {number} must be a valid number")
+			if not 1 <= vel <= 127: print_error(f"velocity at line {number} must be 1-127")
+			continue
 		if line.startswith("dodeca"):
-			if detected_dodeca:
-				print_error(f"duplicated dodeca at line {number}")
-			else:
-				detected_dodeca = True; continue
+			if detected_dodeca: print_error(f"duplicated dodeca at line {number}")
+			detected_dodeca = True; continue
 		
-		if line.startswith("c_"):
+		if line.startswith("c_") or line.startswith("o_"):
 			if step_c:
 				if not step_t: print_error(f"new track started at line {number} without finish the previous")
 				temp["instrument"] = instruments[temp["instrument"]]
 				for subtrack in temp['subtrack']:
 					page.append({
-						'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'],
+						'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
 						"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2]
 					})
-				step_c, step_n, step_t, step_m = False, False, False, False
+				step_c, step_n, step_t, step_m, step_v = False, False, False, False, False
 			step_c = True
 			items = re.split(r'[;\s]+', line)
 			if not items[-1]: items.pop()
@@ -727,11 +727,15 @@ def parse_hrmidi() -> list:
 				instruments_used.add(instruments[instrument])
 				if len(instruments_used) > 15: print_error("too many normal instruments used, the limit is 15")
 				clef = str_to_number(items[1])
-				if not isinstance(clef, int):
+				octave = line.startswith("o_")
+				if isinstance(clef, int):
+					if octave: clef += 4
+				else:
+					if octave: print_error(f"invalid octave number at line {number}")
 					if clef not in clefs.keys(): print_error(f"invalid clef name at line {number}")
 					clef = clefs[clef]
 				if -5 > clef > 5: print_error(f"invalid clef at line {number} (limit is from -5 to 5)")
-			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "keys": [], "times": [], "shift": [], "subtrack": []}
+			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "velocity": vel, "keys": [], "times": [], "shift": [], "subtrack": []}
 			continue
 		if line.startswith("n_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
@@ -837,6 +841,20 @@ def parse_hrmidi() -> list:
 			temp["keys"] = []; temp['times'] = []; temp['shift'] = []
 			step_t = True # This is important to see if a track is complete
 			continue
+		if line.startswith("v_"):
+			if not step_c: print_error(f"line {number} does not have clef declaration above")
+			if step_v: print_error(f"duplicate and/or invalid track velocity at line {number}")
+			items = re.split(r'[;\s]+', line)
+			if not items[-1]: items.pop()
+			if len(items) != 2: print_error(f"invalid arguments number at line {number} (must be two)")
+			instrument: str = items[0].replace('v_', '')
+			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
+			velocity = str_to_number(items[1])
+			if not isinstance(velocity, int): print_error(f"velocity at line {number} must be a valid number")
+			if not 1 <= velocity <= 127: print_error(f"velocity at line {number} must be from 1 to 127")
+			temp["velocity"] = velocity
+			step_v = True
+			continue
 		if line.startswith("m_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
 			if step_m: print_error(f"duplicate and/or invalid modifier at line {number}")
@@ -857,12 +875,12 @@ def parse_hrmidi() -> list:
 			temp["instrument"] = instruments[temp["instrument"]]
 			for subtrack in temp['subtrack']:
 				page.append({
-					'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'],
+					'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
 					"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2]
 				})
 			source.append(page)
 			temp = {}; page = []
-			step_c, step_n, step_t, step_m, detected_dodeca = False, False, False, False, False
+			step_c, step_n, step_t, step_m, step_v, detected_dodeca = False, False, False, False, False, False
 			continue
 		print_error(f'unknow instruction at line {number}')
 	
@@ -872,7 +890,7 @@ def parse_hrmidi() -> list:
 	temp["instrument"] = instruments[temp["instrument"]]
 	for subtrack in temp['subtrack']:
 		page.append({
-			'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'],
+			'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
 			"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2]
 		})
 	source.append(page)
@@ -951,11 +969,11 @@ def make_midi() -> bytes:
 							vlq(delay)	# When the note will start, after previous event
 							,NOTE_ON
 							,bytes([k])	# Note Value
-							,bytes([63])# "velocity" - in pratice the volume
+							,bytes([track['velocity']])# "velocity" 0 - 127
 							,vlq(t)		# When the note will end
 							,NOTE_OFF
 							,bytes([k])	# Note Value
-							,bytes([0])	# "velocity" - some instruments may act diferent with non 0
+							,bytes([0])	# "velocity" - slowest
 						]
 						delay = 0
 			else:
@@ -972,7 +990,7 @@ def make_midi() -> bytes:
 							kk += (ss * 12) # Shift the clef
 							real_keys.append((bytes([kk]), bool(zd))) # zd means zero delay for symultaneous notes
 						chunk += [
-							*(i for kk, zd in real_keys for i in (vlq(0 if zd else delay), NOTE_ON, kk, bytes([63])))
+							*(i for kk, zd in real_keys for i in (vlq(0 if zd else delay), NOTE_ON, kk, bytes([track['velocity']])))
 							,*(i for kk, zd in real_keys for i in (vlq(0 if zd else t), NOTE_OFF, kk, bytes([0])))
 						]
 						delay = 0
