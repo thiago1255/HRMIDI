@@ -623,8 +623,22 @@ def parse_hrmidi() -> list:
 			output.append(time)
 		return output
 
-	def parse_percussion(items):
-		return [0 if i in ('0', '_') else 14 for i in items]
+	def parse_percussion(number, items):
+		t_k = []; t_v = []
+		for key in items:
+			if '[' in key:
+				k: str = f"{key}"
+				items = key.split('[')
+				if len(items) > 2: print_error(f"invalid number of [ in '{k}' at line {number}")
+				key = items[0]
+				vv = str_to_number(items[1].replace(']', ''))
+				if not isinstance(vv, int): print_error(f"velocity at line {number}, '{k}' must be a valid number")
+				if not 1 <= vv <= 127: print_error(f"velocity at line {number}, '{k}' must be 1-127")
+			else:
+				vv = 0
+			t_k.append((0 if key in ('0', '_') else 14))
+			t_v.append(vv)
+		return (t_k, t_v)
 
 	def parse_notes(number, keys_list):
 		temp_keys = []
@@ -632,17 +646,17 @@ def parse_hrmidi() -> list:
 		temp_vel = []
 		for key in keys_list:
 			k: str = f"{key}"
-			shift: int = (key.count('+') - key.count('-'))
-			key = key.replace('-', '').replace('+', '')
 			if '[' in key:
 				items = key.replace(']', '').split('[')
 				if len(items) > 2: print_error(f"invalid number of [ in '{k}' at line {number}")
 				key = items[0]
 				vv = str_to_number(items[1])
 				if not isinstance(vv, int): print_error(f"velocity at line {number}, '{k}' must be a valid number")
-				if not 1 <= vel <= 127: print_error(f"velocity at line {number}, '{k}' must be 1-127")
+				if not 1 <= vv <= 127: print_error(f"velocity at line {number}, '{k}' must be 1-127")
 			else:
 				vv = 0
+			shift: int = (key.count('+') - key.count('-'))
+			key = key.replace('-', '').replace('+', '')
 			if detected_dodeca: key = str_to_number(key)
 			if key not in keys.keys(): print_error(f"invalid key '{k}' at line {number}")
 			key = keys[key]
@@ -758,7 +772,7 @@ def parse_hrmidi() -> list:
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			if instruments[instrument] == 129:
 				if '(' in line or ')' in line: print_error(f"percurssion cannot have (), found at line {number}")
-				temp["keys"] = parse_percussion(items[1:])
+				temp["keys"], temp["vels"] = parse_percussion(number, items[1:])
 				step_n = True
 				continue
 			del items
@@ -850,7 +864,7 @@ def parse_hrmidi() -> list:
 				else:
 					values.append(item)
 			temp["times"] = parse_times(number, times)
-			if p: temp["keys"] = parse_percussion(notes)
+			if p: temp["keys"], temp["vels"] = parse_percussion(number, notes)
 			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift'], temp["vels"]))
 			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []
 			step_t = True # This is important to see if a track is complete
@@ -1066,24 +1080,34 @@ def make_hr() -> str:
 			modifier = track['modifier']
 			result += f"C_{instrument} {clefs_dict[track['clef']]}\n"
 			if single_mode:
-				result += f"NT_{instrument}"
-				if not track['shift']: track['shift'] = [0] * len(track['keys'])
-				for kk, vv, ss, time in zip(track['keys'], track['vels'], track['shift'], track['times']):
-					for key, vel, shift in zip(kk, vv, ss):
-						result += " "
-						if shift < 0:
-							result += (-shift * "-")
-						elif shift > 0:
-							result += (shift * "+")
+				result += f"NT_{instrument} "
+				if track["instrument"] == 129:
+					for key, time in zip(track['keys'], track['times']):
 						result += keys_dict[key]
-						if vel:
-							result += f'[{vel}]'
-					result += ';'
-					if convert_modifier:
-						time = (time / modifier)
-					result += str(time / BEAT_BASE)
-					result += ' \\'
-				result = result[:-1]
+						result += " "
+						if convert_modifier:
+							time = (time / modifier)
+						result += str(time / BEAT_BASE)
+						result += ' \\ '
+					result = result[:-2]
+				else:
+					if not track['shift']: track['shift'] = [0] * len(track['keys'])
+					for kk, vv, ss, time in zip(track['keys'], track['vels'], track['shift'], track['times']):
+						for key, vel, shift in zip(kk, vv, ss):
+							result += " "
+							if shift < 0:
+								result += (-shift * "-")
+							elif shift > 0:
+								result += (shift * "+")
+							result += keys_dict[key]
+							if vel:
+								result += f'[{vel}]'
+						result += ';'
+						if convert_modifier:
+							time = (time / modifier)
+						result += str(time / BEAT_BASE)
+						result += ' \\'
+					result = result[:-1]
 			else:
 				result += f"N_{instrument} "
 				if track["instrument"] == 129:
@@ -1091,7 +1115,7 @@ def make_hr() -> str:
 						result += keys_dict[key]
 						result += " 	"
 				else:
-					for kk, vv, ss in zip(track['keys'], track['shift']):
+					for kk, vv, ss in zip(track['keys'], track['vels'], track['shift']):
 						if len(kk) == 1:
 							key = kk[0]; shift = ss[0]; vel = vv[0]
 							if shift < 0:
