@@ -1068,14 +1068,16 @@ def make_hr() -> str:
 			if single_mode:
 				result += f"NT_{instrument}"
 				if not track['shift']: track['shift'] = [0] * len(track['keys'])
-				for kk, ss, time in zip(track['keys'], track['shift'], track['times']):
-					for key, shift in zip(kk, ss):
+				for kk, vv, ss, time in zip(track['keys'], track['vels'], track['shift'], track['times']):
+					for key, vel, shift in zip(kk, vv, ss):
 						result += " "
 						if shift < 0:
 							result += (-shift * "-")
 						elif shift > 0:
 							result += (shift * "+")
 						result += keys_dict[key]
+						if vel:
+							result += f'[{vel}]'
 					result += ';'
 					if convert_modifier:
 						time = (time / modifier)
@@ -1089,23 +1091,27 @@ def make_hr() -> str:
 						result += keys_dict[key]
 						result += " 	"
 				else:
-					for kk, ss in zip(track['keys'], track['shift']):
+					for kk, vv, ss in zip(track['keys'], track['shift']):
 						if len(kk) == 1:
-							key = kk[0]; shift = ss[0]
+							key = kk[0]; shift = ss[0]; vel = vv[0]
 							if shift < 0:
 								result += (-shift * "-")
 							elif shift > 0:
 								result += (shift * "+")
 							result += keys_dict[key]
+							if vel:
+								result += f'[{vel}]'
 							result += " 	"
 							continue
 						result += "("
-						for key, shift in zip(kk, ss):
+						for key, vel, shift in zip(kk, vv, ss):
 							if shift < 0:
 								result += (-shift * "-")
 							elif shift > 0:
 								result += (shift * "+")
 							result += keys_dict[key]
+							if vel:
+								result += f'[{vel}]'
 							result += ';'
 						result = result[:-1] + ")	"
 				result += f"\nT_{instrument} "
@@ -1114,6 +1120,7 @@ def make_hr() -> str:
 						time = (time / modifier)
 					result += str(time / BEAT_BASE)
 					result += " 	"
+			result += f"\nV_{instrument} {track['velocity']}"
 			if not convert_modifier:
 				result += f"\nM_{instrument} {modifier}"
 			result += "\n\n"
