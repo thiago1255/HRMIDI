@@ -629,10 +629,20 @@ def parse_hrmidi() -> list:
 	def parse_notes(number, keys_list):
 		temp_keys = []
 		temp_shift = []
+		temp_vel = []
 		for key in keys_list:
 			k: str = f"{key}"
 			shift: int = (key.count('+') - key.count('-'))
 			key = key.replace('-', '').replace('+', '')
+			if '[' in key:
+				items = key.replace(']', '').split('[')
+				if len(items) > 2: print_error(f"invalid number of [ in '{k}' at line {number}")
+				key = items[0]
+				vv = str_to_number(items[1])
+				if not isinstance(vv, int): print_error(f"velocity at line {number}, '{k}' must be a valid number")
+				if not 1 <= vel <= 127: print_error(f"velocity at line {number}, '{k}' must be 1-127")
+			else:
+				vv = 0
 			if detected_dodeca: key = str_to_number(key)
 			if key not in keys.keys(): print_error(f"invalid key '{k}' at line {number}")
 			key = keys[key]
@@ -646,10 +656,12 @@ def parse_hrmidi() -> list:
 			if key != 0:
 				temp_keys.append(key)
 				temp_shift.append(shift)
+				temp_vel.append(vv)
 		if not temp_keys:
 			temp_keys = [0]
 			temp_shift = [0]
-		return (temp_keys, temp_shift)
+			temp_vel = [0]
+		return (temp_keys, temp_shift, temp_vel)
 
 	lines: dict[int,str] = {number:valid for number,line in enumerate(file.split("\n"), start=1) if (valid := line.split("//")[0].strip().lower().replace(",", "."))}
 	
@@ -711,7 +723,7 @@ def parse_hrmidi() -> list:
 				for subtrack in temp['subtrack']:
 					page.append({
 						'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
-						"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2]
+						"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3]
 					})
 				step_c, step_n, step_t, step_m, step_v = False, False, False, False, False
 			step_c = True
@@ -735,7 +747,7 @@ def parse_hrmidi() -> list:
 					if clef not in clefs.keys(): print_error(f"invalid clef name at line {number}")
 					clef = clefs[clef]
 				if -5 > clef > 5: print_error(f"invalid clef at line {number} (limit is from -5 to 5)")
-			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "velocity": vel, "keys": [], "times": [], "shift": [], "subtrack": []}
+			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "velocity": vel, "vels": [], "keys": [], "times": [], "shift": [], "subtrack": []}
 			continue
 		if line.startswith("n_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
@@ -787,9 +799,10 @@ def parse_hrmidi() -> list:
 			del t,l,p,e
 			# ! manual parser end !
 			for keys_list in items[1:]:
-				temp_keys, temp_shift = parse_notes(number, keys_list)
+				temp_keys, temp_shift, temp_velocity = parse_notes(number, keys_list)
 				temp["keys"].append(temp_keys)
 				temp["shift"].append(temp_shift)
+				temp["vels"].append(temp_velocity)
 			step_n = True
 			step_t = False # Added so many T and N can be written at the same track
 			continue
@@ -803,8 +816,8 @@ def parse_hrmidi() -> list:
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			temp["times"] = parse_times(number, items[1:])
 			if len(temp['keys']) != len(temp['times']): print_error(f"line {number} dont have the same ammount of items as the key line above")
-			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift']))
-			temp["keys"] = []; temp['times'] = []; temp['shift'] = []
+			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift'], temp["vels"]))
+			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []
 			step_t = True # This is important to see if a track is complete
 			step_n = False # Added so many T and N can be written at the same track
 			continue
@@ -829,16 +842,17 @@ def parse_hrmidi() -> list:
 						if len(n) > 1: print_error(f"line {number} (percussion) cannot have more than 1 note per time")
 						notes.append(n[0])
 					else:
-						temp_keys, temp_shift = parse_notes(number, n)
+						temp_keys, temp_shift, temp_velocity = parse_notes(number, n)
 						temp["keys"].append(temp_keys)
 						temp["shift"].append(temp_shift)
+						temp["vels"].append(temp_velocity)
 					values = []
 				else:
 					values.append(item)
 			temp["times"] = parse_times(number, times)
 			if p: temp["keys"] = parse_percussion(notes)
-			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift']))
-			temp["keys"] = []; temp['times'] = []; temp['shift'] = []
+			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift'], temp["vels"]))
+			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []
 			step_t = True # This is important to see if a track is complete
 			continue
 		if line.startswith("v_"):
@@ -876,7 +890,7 @@ def parse_hrmidi() -> list:
 			for subtrack in temp['subtrack']:
 				page.append({
 					'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
-					"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2]
+					"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3]
 				})
 			source.append(page)
 			temp = {}; page = []
@@ -891,7 +905,7 @@ def parse_hrmidi() -> list:
 	for subtrack in temp['subtrack']:
 		page.append({
 			'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
-			"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2]
+			"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3]
 		})
 	source.append(page)
 	return source

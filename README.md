@@ -44,4 +44,3 @@ Check the [manual](man/man1/hrmidi.1.md) for more details.
 ### Version 4:
 - pkg generator (to install on arch based distros)
 - text replace (probably argument on compiler)
-- maybe: volume control (speed only, or channel volume ?)
