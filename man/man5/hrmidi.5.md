@@ -41,10 +41,15 @@ Lines that sets global settings for the entire file, can be placed anywhere on t
 :	Sets the version of the language, may have uses in the future for compatibility.
 
 **PAGE** or **PAG** [Optional]
-:	Play all the tracks inside before start the tracks of the next page. (Tracks at the beggining of the document will belong to the first page, withowt using the term)
+:	Play all the tracks inside before start the tracks of the next page (Tracks at the beggining of the document will belong to the first page, withowt using the term).
 
 **DODECA** [Optional]
 :	Enables the dodecaphonic mode for tracks below it, inside the page.
+
+**VEL** *velocity 1-127* [Optional]
+:	Defines the standard velocity (from 63 to the declared number) of note atack, in midi this is like the volume.
+
+	Changes to the whole text below, can be repeated on the document.
 
 # TRACK
 
@@ -58,6 +63,8 @@ The tracks must have: exactly 1 `C_`; minimum of 1 `N_` followed by 1 `T_`, or 1
 :	Sets the clef of this track. Can be written with number or using textual mode:
 
 	Available clefs: Bass = -1, Treble = 0, Alto = Tenor = 1. Other integer numbers can be used besides those, the limit is from -5 to 5.
+
+	Alternativly O_INSTRUMENT can be used for octaves (4th octave = clef 0).
 
 **N** *keys* (Mandatory)
 :	Sets each key and break of the track, each one must be split using the *Formatting* described on section **DESCRIPTION**.
@@ -75,6 +82,8 @@ The tracks must have: exactly 1 `C_`; minimum of 1 `N_` followed by 1 `T_`, or 1
 	With dodecaphonic mode enabled, numbers notes will be read from 1-12, an attemp to write sharp/flat on a number will result in being read as the "numeric" (non dodecaphonic) mode previously cited.
 	
 	They keys are limited from 0 to 127, this is, from "Do at clef -5" to "Sol at clef 5"
+	
+	It is possible to change the individual atack velocity of notes (like in head's **VEL**) writing like `Do[100]`, withowt space, the use of `]` at end is optional.
 
 **T** *times* (Mandatory)
 :	Sets the duration of each key or break from the keys line - how many beats. Must have the same amount of items as the keys line, which must be above this.
@@ -90,6 +99,11 @@ The tracks must have: exactly 1 `C_`; minimum of 1 `N_` followed by 1 `T_`, or 1
 
 **M** *number* [Optional]
 :	Time modifier for the track, each duration is divided by this number.
+
+**V** *number* [Optional]
+:	Track velocity, same as head's **VEL**.
+
+	The priority order is Key -> Track -> Head.
 
 # INSTRUMENTS
 
@@ -276,7 +290,7 @@ To use percussion, you must use the `percussion` normally as instrument, but spe
 - triangle-mute
 - triangle-open
 
-On notes section of percussions, any text will be interpreted as a beat, except for the `0` and `_` than mean "no sound". Parentheses can not be written here.
+On notes section of percussions, any text will be interpreted as a beat, except for the `0` and `_` than mean "no sound". Parentheses can not be written here. The use of `[` will trigger the velocity modifier !
 
 # SEE ALSO
 

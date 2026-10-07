@@ -46,6 +46,11 @@ Linhas que definem elementos universais para todo o arquivo, podem ser escritos 
 **DODECA** [Opcional]
 :	Ativa o modo dodecafonico para trilhas abaixo, dentro da página.
 
+**VEL** *velocidade 1-127* [Opcional]
+:	Define a velocidade padrão (de 63 para o número declarado) de ataque da nota, em midi isto está mais para o volume.
+
+	Mudará para todo o texto abaixo, podendo se repetir ao longo do documento.
+
 # TRILHA
 
 Define uma trilha de um instrumento, deve ser declarada começando com a clave.
@@ -58,6 +63,8 @@ As trilhas devem ter: exatamente 1 `C_`; mínimo de 1 `N_` seguido de 1 `T_`, ou
 :	Define a clave da trilha. Pode ser escrita com número inteiro ou em forma de texto:
 
 	Claves disponíveis: Fa = -1, Sol = 0, Do = 1. Outros números inteiros podem usados além desses, o limite vai de -5 a 5.
+
+	Alternativamente pode-se declarar O_INSTRUMENTO, para usar as oitavas (4ª oitava = clave 0).
 
 **N** *notas* (Obrigatório)
 :	Define cada nota e pausa da trilha, cada uma deve ser separada seguindo a *formatação* descrita na seção **DESCRIÇÃO**.
@@ -75,6 +82,8 @@ As trilhas devem ter: exatamente 1 `C_`; mínimo de 1 `N_` seguido de 1 `T_`, ou
 	Com o modo dodecafonico ligado, as notas númericas serão lidas de 1-12, escrever números com sustenido/bemol resultará em eles serem interpretados no modo númerico citado anteriormente (não dodecafonico).
 	
 	O limite das notas é de 0 até 127, ou seja, de "Dó na clave -5" até "Sol na clave 5".
+	
+	É possível mudar a velocidade individual de ataque das notas (assim como **VEL** do cabeçalho) escrevendo `Do[100]`, sem espaço, o uso de `]` no final é opcional.
 
 **T** *tempos* (Obrigatório)
 :	Define o tempo de cada nota ou pausa da linha das notas - quantas batidas ela vale. Deve ter a mesma quantidade de itens que a linha de notas, que deve estar acima desta.
@@ -90,6 +99,11 @@ As trilhas devem ter: exatamente 1 `C_`; mínimo de 1 `N_` seguido de 1 `T_`, ou
 
 **M** *número* [Opcional]
 :	Modificador do tempo, multiplica-se a velocidade pelo número aqui declarado. Ex: Mudar para "2" vai fazer os tempos "1" virarem "0,5".
+
+**V** *número* [Opcional]
+:	Velocidade da trilha, o mesmo que **VEL** do cabeçalho.
+
+	A ordem de prioridade é Nota -> Trilha -> Cabeçalho.
 
 # INSTRUMENTOS
 
@@ -276,7 +290,7 @@ Para usar percussão, deve-se usar `percussao` assim como qualquer instrumento, 
 - triangulo-abafado
 - triangulo-aberto
 
-Na parte das notas das percussões, qualquer texto vai ser interpretado como uma batida, com exceção de `0` e `_` que significam pausas. Parênteses não podem ser usados aqui.
+Na parte das notas das percussões, qualquer texto vai ser interpretado como uma batida, com exceção de `0` e `_` que significam pausas. Parênteses não podem ser usados aqui. O uso de `[` vai ativar o modificador de velocidade !
 
 # VER TAMBÉM
 

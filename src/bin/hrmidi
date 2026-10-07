@@ -1082,8 +1082,10 @@ def make_hr() -> str:
 			if single_mode:
 				result += f"NT_{instrument} "
 				if track["instrument"] == 129:
-					for key, time in zip(track['keys'], track['times']):
+					for key, time, vel in zip(track['keys'], track['times'], track['vels']):
 						result += keys_dict[key]
+						if vel:
+							result += f'[{vel}]'
 						result += " "
 						if convert_modifier:
 							time = (time / modifier)
@@ -1111,8 +1113,10 @@ def make_hr() -> str:
 			else:
 				result += f"N_{instrument} "
 				if track["instrument"] == 129:
-					for key in track['keys']:
+					for key, vel in zip(track['keys'], track['vels']):
 						result += keys_dict[key]
+						if vel:
+							result += f'[{vel}]'
 						result += " 	"
 				else:
 					for kk, vv, ss in zip(track['keys'], track['vels'], track['shift']):
