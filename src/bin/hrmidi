@@ -689,7 +689,7 @@ def parse_hrmidi() -> list:
 			temp_shift = [0]
 			temp_vel = [0]
 			temp_vib = [0]
-		return (temp_keys, temp_shift, temp_vel)
+		return (temp_keys, temp_shift, temp_vel, temp_vib)
 
 	lines: dict[int,str] = {number:valid for number,line in enumerate(file.split("\n"), start=1) if (valid := line.split("//")[0].strip().lower().replace(",", "."))}
 	
@@ -1042,6 +1042,7 @@ def make_midi() -> bytes:
 							*(i for kk, vv, vi, zd in real_keys for i in (vlq(0 if zd else delay), NOTE_ON, kk, bytes([(vv or track['velocity'])])))
 							,*(i for kk, vv, vi, zd in real_keys if vi for i in (vlq(0), NOTE_VIB, kk, bytes([vi])))
 							,*(i for kk, vv, vi, zd in real_keys for i in (vlq(0 if zd else t), NOTE_OFF, kk, bytes([0])))
+							,*(i for kk, vv, vi, zd in real_keys if vi for i in (vlq(0), NOTE_VIB, kk, bytes([0])))
 						]
 						delay = 0
 			if tmp_offset > next_offset: next_offset = tmp_offset
@@ -1051,7 +1052,7 @@ def make_midi() -> bytes:
 
 def make_hr() -> str:
 	global hrmidi_format
-	OTARBIV: dict = {v:k for k:v in VIBRATO.items()}
+	OTARBIV: dict = {v:k for k,v in VIBRATO.items()}
 	result: str = f"LANG {language}\nBPM {source[0]}\nVER {version}\n\n"
 	if not hrmidi_format:
 		hrmidi_format = ""
