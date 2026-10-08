@@ -554,6 +554,13 @@ keys_alpha: dict = {
 	,12:	"B"
 }
 
+VIBRATO: dict = {
+	0: 0
+	,1: 15
+	,2: 63
+	,3: 127
+}
+
 page_names: tuple[str, ...] = ('pag', 'page', 'pagina')
 
 BEAT_BASE:int = 30 # The ammount of beats must be multiplied by this
@@ -656,6 +663,9 @@ def parse_hrmidi() -> list:
 			else:
 				vv = 0
 			shift: int = (key.count('+') - key.count('-'))
+			vib: int = key.count('~')
+			if vib > 3: print_error(f"too many vibrato ~ at line {number}, '{k}' must be 0-3")
+			vib = VIBRATO[vib]
 			key = key.replace('-', '').replace('+', '')
 			if detected_dodeca: key = str_to_number(key)
 			if key not in keys.keys(): print_error(f"invalid key '{k}' at line {number}")
@@ -671,10 +681,12 @@ def parse_hrmidi() -> list:
 				temp_keys.append(key)
 				temp_shift.append(shift)
 				temp_vel.append(vv)
+				temp_vib.append(vib)
 		if not temp_keys:
 			temp_keys = [0]
 			temp_shift = [0]
 			temp_vel = [0]
+			temp_vib = [0]
 		return (temp_keys, temp_shift, temp_vel)
 
 	lines: dict[int,str] = {number:valid for number,line in enumerate(file.split("\n"), start=1) if (valid := line.split("//")[0].strip().lower().replace(",", "."))}
@@ -737,7 +749,7 @@ def parse_hrmidi() -> list:
 				for subtrack in temp['subtrack']:
 					page.append({
 						'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
-						"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3]
+						"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3], "vibs": subtrack[4]
 					})
 				step_c, step_n, step_t, step_m, step_v = False, False, False, False, False
 			step_c = True
@@ -761,7 +773,8 @@ def parse_hrmidi() -> list:
 					if clef not in clefs.keys(): print_error(f"invalid clef name at line {number}")
 					clef = clefs[clef]
 				if -5 > clef > 5: print_error(f"invalid clef at line {number} (limit is from -5 to 5)")
-			temp = {'instrument': instrument, 'clef': clef, "modifier": 1, "velocity": vel, "vels": [], "keys": [], "times": [], "shift": [], "subtrack": []}
+			temp = { 'instrument': instrument, 'clef': clef, "modifier": 1, "velocity": vel,
+				"keys": [], "times": [], "shift": [], "vels": [], "vibs": [], "subtrack": []}
 			continue
 		if line.startswith("n_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
@@ -773,6 +786,7 @@ def parse_hrmidi() -> list:
 			if instruments[instrument] == 129:
 				if '(' in line or ')' in line: print_error(f"percurssion cannot have (), found at line {number}")
 				temp["keys"], temp["vels"] = parse_percussion(number, items[1:])
+				temp["vibs"] = [0] * len(temp["keys"])
 				step_n = True
 				continue
 			del items
@@ -813,10 +827,11 @@ def parse_hrmidi() -> list:
 			del t,l,p,e
 			# ! manual parser end !
 			for keys_list in items[1:]:
-				temp_keys, temp_shift, temp_velocity = parse_notes(number, keys_list)
+				temp_keys, temp_shift, temp_velocity, temp_vibrato = parse_notes(number, keys_list)
 				temp["keys"].append(temp_keys)
 				temp["shift"].append(temp_shift)
 				temp["vels"].append(temp_velocity)
+				temp["vibs"].append(temp_vibrato)
 			step_n = True
 			step_t = False # Added so many T and N can be written at the same track
 			continue
@@ -830,8 +845,8 @@ def parse_hrmidi() -> list:
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			temp["times"] = parse_times(number, items[1:])
 			if len(temp['keys']) != len(temp['times']): print_error(f"line {number} dont have the same ammount of items as the key line above")
-			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift'], temp["vels"]))
-			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []
+			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift'], temp["vels"], temp["vibs"]))
+			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []; temp["vibs"] = []
 			step_t = True # This is important to see if a track is complete
 			step_n = False # Added so many T and N can be written at the same track
 			continue
@@ -856,17 +871,20 @@ def parse_hrmidi() -> list:
 						if len(n) > 1: print_error(f"line {number} (percussion) cannot have more than 1 note per time")
 						notes.append(n[0])
 					else:
-						temp_keys, temp_shift, temp_velocity = parse_notes(number, n)
+						temp_keys, temp_shift, temp_velocity, temp_vibrato = parse_notes(number, n)
 						temp["keys"].append(temp_keys)
 						temp["shift"].append(temp_shift)
 						temp["vels"].append(temp_velocity)
+						temp["vibs"].append(temp_vibrato)
 					values = []
 				else:
 					values.append(item)
 			temp["times"] = parse_times(number, times)
-			if p: temp["keys"], temp["vels"] = parse_percussion(number, notes)
-			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift'], temp["vels"]))
-			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []
+			if p:
+				temp["keys"], temp["vels"] = parse_percussion(number, notes)
+				temp["vibs"] = [0] * len(temp["keys"])
+			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift'], temp["vels"], temp["vibs"]))
+			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []; temp["vibs"] = []
 			step_t = True # This is important to see if a track is complete
 			continue
 		if line.startswith("v_"):
@@ -904,7 +922,7 @@ def parse_hrmidi() -> list:
 			for subtrack in temp['subtrack']:
 				page.append({
 					'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
-					"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3]
+					"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3], "vibs": subtrack[4]
 				})
 			source.append(page)
 			temp = {}; page = []
@@ -919,7 +937,7 @@ def parse_hrmidi() -> list:
 	for subtrack in temp['subtrack']:
 		page.append({
 			'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
-			"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3]
+			"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3], "vibs": subtrack[4]
 		})
 	source.append(page)
 	return source
@@ -983,7 +1001,8 @@ def make_midi() -> bytes:
 
 			NOTE_ON = bytes([0x90 | channel])
 			NOTE_OFF = bytes([0x80 | channel])
-	
+			NOTE_VIB - bytes([0xA0 | channel])
+
 			delay: int = 0
 			if channel == 9:
 				for k, t, v in zip(track['keys'], track['times'], track['vels']):
@@ -1005,21 +1024,22 @@ def make_midi() -> bytes:
 						]
 						delay = 0
 			else:
-				for k, s, t, v in zip(track['keys'], track['shift'], track['times'], track['vels']):
+				for k, s, t, v, V in zip(track['keys'], track['shift'], track['times'], track['vels'], track['vibs']):
 					t = int(t * TICKS / track['modifier'])
 					tmp_offset += t
 					if k == [0]:
 						delay += t
 					else:
 						real_keys: list = []
-						for kk, ss, vv, zd in zip(k, s, v, range(len(k))):
+						for kk, ss, vv, vi, zd in zip(k, s, v, V, range(len(k))):
 							kk -= 1 # In midi they start at 0, not 1
 							kk += ((track['clef'] + 5) * 12) # Sets the clef
 							kk += (ss * 12) # Shift the clef
-							real_keys.append((bytes([kk]), vv, bool(zd))) # zd means zero delay for symultaneous notes
+							real_keys.append((bytes([kk]), vv, vi, bool(zd))) # zd means zero delay for symultaneous notes
 						chunk += [
-							*(i for kk, vv, zd in real_keys for i in (vlq(0 if zd else delay), NOTE_ON, kk, bytes([(vv or track['velocity'])])))
-							,*(i for kk, vv, zd in real_keys for i in (vlq(0 if zd else t), NOTE_OFF, kk, bytes([0])))
+							*(i for kk, vv, vi, zd in real_keys for i in (vlq(0 if zd else delay), NOTE_ON, kk, bytes([(vv or track['velocity'])])))
+							,*(i for kk, vv, vi, zd in real_keys for i in (vlq(0), NOTE_VIB, kk, bytes([vi])))
+							,*(i for kk, vv, vi, zd in real_keys for i in (vlq(0 if zd else t), NOTE_OFF, kk, bytes([0])))
 						]
 						delay = 0
 			if tmp_offset > next_offset: next_offset = tmp_offset
@@ -1029,6 +1049,7 @@ def make_midi() -> bytes:
 
 def make_hr() -> str:
 	global hrmidi_format
+	OTARBIV: dict = {v:k for k:v in VIBRATO}
 	result: str = f"LANG {language}\nBPM {source[0]}\nVER {version}\n\n"
 	if not hrmidi_format:
 		hrmidi_format = ""
@@ -1094,8 +1115,8 @@ def make_hr() -> str:
 					result = result[:-2]
 				else:
 					if not track['shift']: track['shift'] = [0] * len(track['keys'])
-					for kk, vv, ss, time in zip(track['keys'], track['vels'], track['shift'], track['times']):
-						for key, vel, shift in zip(kk, vv, ss):
+					for kk, vv, ss, vibs, time in zip(track['keys'], track['vels'], track['shift'], track['vibs'], track['times']):
+						for key, vel, shift, vib in zip(kk, vv, ss, vibs):
 							result += " "
 							if shift < 0:
 								result += (-shift * "-")
@@ -1104,6 +1125,7 @@ def make_hr() -> str:
 							result += keys_dict[key]
 							if vel:
 								result += f'[{vel}]'
+							result += (OTARBIV[vib] * "~")
 						result += ';'
 						if convert_modifier:
 							time = (time / modifier)
@@ -1119,9 +1141,9 @@ def make_hr() -> str:
 							result += f'[{vel}]'
 						result += " 	"
 				else:
-					for kk, vv, ss in zip(track['keys'], track['vels'], track['shift']):
+					for kk, vv, ss, vibs in zip(track['keys'], track['vels'], track['shift'], track['vibs']):
 						if len(kk) == 1:
-							key = kk[0]; shift = ss[0]; vel = vv[0]
+							key = kk[0]; shift = ss[0]; vel = vv[0]; vib = vibs[0]
 							if shift < 0:
 								result += (-shift * "-")
 							elif shift > 0:
@@ -1129,10 +1151,11 @@ def make_hr() -> str:
 							result += keys_dict[key]
 							if vel:
 								result += f'[{vel}]'
+							result += (OTARBIV[vib] * "~")
 							result += " 	"
 							continue
 						result += "("
-						for key, vel, shift in zip(kk, vv, ss):
+						for key, vel, shift, vib in zip(kk, vv, ss, vibs):
 							if shift < 0:
 								result += (-shift * "-")
 							elif shift > 0:
@@ -1140,6 +1163,7 @@ def make_hr() -> str:
 							result += keys_dict[key]
 							if vel:
 								result += f'[{vel}]'
+							result += (OTARBIV[vib] * "~")
 							result += ';'
 						result = result[:-1] + ")	"
 				result += f"\nT_{instrument} "
