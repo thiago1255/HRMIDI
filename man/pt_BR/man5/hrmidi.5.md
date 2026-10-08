@@ -84,6 +84,8 @@ As trilhas devem ter: exatamente 1 `C_`; mínimo de 1 `N_` seguido de 1 `T_`, ou
 	O limite das notas é de 0 até 127, ou seja, de "Dó na clave -5" até "Sol na clave 5".
 	
 	É possível mudar a velocidade individual de ataque das notas (assim como **VEL** do cabeçalho) escrevendo `Do[100]`, sem espaço, o uso de `]` no final é opcional.
+	
+	Para adicionar vibrato pode-se usar `~`, até 3 vezes, mapeando o *Aftertouch* do midi para 15, 63 ou 127 (máximo). Em futuras versões isso pode-se tornar configuravel.
 
 **T** *tempos* (Obrigatório)
 :	Define o tempo de cada nota ou pausa da linha das notas - quantas batidas ela vale. Deve ter a mesma quantidade de itens que a linha de notas, que deve estar acima desta.

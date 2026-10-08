@@ -84,6 +84,8 @@ The tracks must have: exactly 1 `C_`; minimum of 1 `N_` followed by 1 `T_`, or 1
 	They keys are limited from 0 to 127, this is, from "Do at clef -5" to "Sol at clef 5"
 	
 	It is possible to change the individual atack velocity of notes (like in head's **VEL**) writing like `Do[100]`, withowt space, the use of `]` at end is optional.
+	
+	To add vibrato, `~` can be used till 3 times, maping midi's *Aftertouch* to 15, 63, or 127 (maximum). In futures versions this may be configurable.
 
 **T** *times* (Mandatory)
 :	Sets the duration of each key or break from the keys line - how many beats. Must have the same amount of items as the keys line, which must be above this.
