@@ -556,9 +556,10 @@ keys_alpha: dict = {
 
 VIBRATO: dict = {
 	0: 0
-	,1: 15
+	,1: 31
 	,2: 63
-	,3: 127
+	,3: 95
+	,4: 127
 }
 
 page_names: tuple[str, ...] = ('pag', 'page', 'pagina')
@@ -656,7 +657,7 @@ def parse_hrmidi() -> list:
 			k: str = f"{key}"
 			shift: int = (key.count('+') - key.count('-'))
 			vib: int = key.count('~')
-			if vib > 3: print_error(f"too many vibrato ~ at line {number}, '{k}' must be 0-3")
+			if vib > 3: print_error(f"too many vibrato ~ at line {number}, '{k}' must be 0-4")
 			vib = VIBRATO[vib]
 			key = key.replace('-', '').replace('+', '').replace('~', '')
 			# The part above must stay there, to clean +-~ before parse velocity
