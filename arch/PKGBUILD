@@ -21,7 +21,7 @@ package() {
 	install -Dm755 src/bin/hrmidi -t "$pkgdir/usr/bin"
 	install -Dm644 LICENSE -t "$pkgdir/usr/share/licenses/$pkgname/"
 	install -Dm644 "$srcdir/hrmidi.1" "$pkgdir/usr/share/man/man1/hrmidi.1"
-	install -Dm644 "$srcdir/hrmidi.5" "$pkgdir/usr/share/man/man5/hrmidi.1"
+	install -Dm644 "$srcdir/hrmidi.5" "$pkgdir/usr/share/man/man5/hrmidi.5"
 	install -Dm644 "$srcdir/hrmidi.pt_BR.1" "$pkgdir/usr/share/man/pt_BR/man1/hrmidi.1"
 	install -Dm644 "$srcdir/hrmidi.pt_BR.5" "$pkgdir/usr/share/man/pt_BR/man5/hrmidi.5"
 }
