@@ -28,7 +28,7 @@ For more info on the language see **hrmidi(5)**.
 
 **-f** *format options*
 :	Only if **-l**  is set for a option that is not *midi*:
-	
+
 	Keys format: n (numeric) f (phonetic) a (alfabetic). Default: n
 	
 	Breaks format: 0 (numeric) _ (underline). This will also decide if percussion notes will be 1 or |. Default: 0
@@ -42,8 +42,18 @@ For more info on the language see **hrmidi(5)**.
 **-o** *file*
 :	Sets the output file name. (The standard is input file name, withowt extensions, followed with .mid or .*language*.hrmidi)
 
+**-r** *file*
+:	Optional json file to replace text during runtime (the original source code feed is not changed).
+
+	The json must be an array (list), where the sub-arrays must contain 2 strings (text):
+	
+	The first text will be the target to be replaced, the second the new text.
+
 **--stdout**
 :	Redirects output to stdout. Disables **-o** to file.
+
+**--debug**
+:	After parser ends, the result will be printed to stdout before goes to compiler or translator.
 
 # EXAMPLES
 

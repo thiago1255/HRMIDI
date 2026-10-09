@@ -4,6 +4,7 @@
 import re
 import os
 import sys
+import json
 from argparse import ArgumentParser
 
 # - - - - - - - constants
@@ -1246,17 +1247,41 @@ if __name__ == "__main__":
 	parser.add_argument('-l', metavar='language', default='midi', choices=languages, help='The output language (Default: midi).')
 	parser.add_argument('-f', metavar='format', default=None, help='The formating for non midi output.')
 	parser.add_argument('-o', metavar='output_file', default=None, help='The name of output file.')
+	parser.add_argument('-r', metavar='replace_file', default=None, help='Takes a json to replace text on parse time.')
 	parser.add_argument('--stdout', action='store_true', help='Outputs to stdout instead file.')
 	parser.add_argument('--debug', action='store_true', help='Prints the processed data by parser.')
 	parser.add_argument('file', help='Name of the input file.')
 
 	args = parser.parse_args()
 	if args.version: print_version()
+
 	try:
-		with open(args.file, 'r') as f: file = f.read()
+		with open(args.file, 'r') as f:
+			file = f.read()
 	except FileNotFoundError:
-		print(f"hrmidi: file '{args.file}' not found.")
-		sys.exit(1)
+		print_error(f"file '{args.file}' not found.")
+	if args.replace_file:
+		try:
+			with open(args.replace_file, 'r') as f:
+				replace_file = json.load(f)
+		except FileNotFoundError:
+			print_error(f"file '{args.replace_file}' not found.")
+		except json.decoder.JSONDecodeError:
+			print_error(f"file '{args.replace_file}' have invalid json.")
+
+		if not isinstance(replace_file, list):
+			print_error('replace file json must be an array')
+		for replace in replace_file:
+			if not isinstance(replace_file, list):
+				print_error('the items of replace file must be arrays')
+			if len(replace) != 2:
+				print_error('the sub-arrays must have 2 items')
+			if not isinstance(replace[0], str):
+				print_error(f'the first item of this subarray is not text: {replace[0]}')
+			if not isinstance(replace[1], str):
+				print_error(f'the second item of this subarray is not text: {replace[1]}')
+			file = file.replace(replace[0], replace[1])
+
 	language, hrmidi_format, output, stdout, debug = args.l, args.f, args.o, args.stdout, args.debug
 	if not output: output = os.path.splitext(os.path.basename(args.file))[0]
 	del parser, args

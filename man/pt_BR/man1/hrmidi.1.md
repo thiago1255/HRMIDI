@@ -28,7 +28,7 @@ Para mais informações sobre a linguagem ver **hrmidi(5)**.
 
 **-f** *opções de formato*
 :	Somente se **-l** for configurado em uma opção que não seja *midi*:
-	
+
 	Formato das notas: n (numérico) f (fonético) a (alfabética). Padrão: n
 	
 	Formato de espaços: 0 (numérico) _ (linha). Isso também decide se as notas de percussão serão 1 ou |. Padrão: 0
@@ -42,8 +42,18 @@ Para mais informações sobre a linguagem ver **hrmidi(5)**.
 **-o** *arquivo*
 :	Seleciona o nome do arquivo de saída. (O padrão é o nome de arquivo de entrada, sem extensões, seguido de .mid ou .*lingua*.hrmidi)
 
+**-r** *arquivo*
+:	Aquivo json opcional para substituição de texto durante *runtime* (o código original fornecido não é alterado).
+
+	O json deve ser uma lista, onde as sub-listas contém 2 *strings* (texto):
+	
+	O primeiro texto é o alvo a ser trocado, o segundo é o texto novo.
+
 **--stdout**
 :	Direciona a saída para stdout. Desativa o **-o** em arquivo.
+
+**--debug**
+:	Depois que o interpretador finaliza, o resultado irá para o sdtout antes de ir para o compilador ou tradutor.
 
 # EXEMPLOS
 

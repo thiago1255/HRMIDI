@@ -27,9 +27,12 @@ The language have some rules:
 - Lines must be split using `\n` (new line);
 - Empty lines will be ignored, you can use them for formating.
 - Keys/terms can be written in lowercase or uppercase, and even mix both;
-- Chords can be written using parentheses, like in `do (re mi fa) sol la` which will result in "4" notes.
+- Chords can be written using parentheses, like in `do (re mi fa) sol la` which will result in "4" notes;
+- Volume (velocity) control, in general, per-track, or per-note;
+- Vibrato can be added by `~`;
+- Automatic chords calculation using `A_INSTRUMENT` line.
 
-**For full technical description and other syntaxes check the [manual pages](man/man5/hrmidi.5.md).**
+**For full technical description and other rules and syntaxes check the [manual pages](man/man5/hrmidi.5.md).**
 
 # The program:
 For now there will be only the `hrmidi` command to compile or convert to another language/type.
@@ -42,6 +45,8 @@ This repository does however have a PKGBUILD for arch based distros.
 
 Check the [manual](man/man1/hrmidi.1.md) for more details.
 
-# Todo:
-### Version 4:
-- text replace (probably argument on compiler)
+# Possible future plans:
+- Way to customize vibrato levels;
+- More optimized compiler (avoid track spam);
+- Semitone shift in clef/octave declaration;
+- Automatic beat generation.
