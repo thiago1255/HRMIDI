@@ -952,9 +952,13 @@ def parse_hrmidi() -> list:
 			step_m = True
 			continue
 		if items[0] in page_names:
-			if len(items) > 2: print_error(f"page at line {number}, have too many arguments (must be 1 or 2)")
-			delay = get_tempo(items[1])
-			if isinstance(delay, str): print_error(f"page delay at line {number} must be a valid number or fraction")
+			if len(items) > 2:
+				print_error(f"page at line {number}, have too many arguments (must be 1 or 2)")
+			elif len(items) == 2:
+				delay = get_tempo(items[1])
+				if isinstance(delay, str): print_error(f"page delay at line {number} must be a valid number or fraction")
+			else:
+				delay = 0
 			if not step_c: print_error(f"new page started at line {number}, but previous didnt had any track")
 			if not step_t: print_error(f"new page started at line {number} without finish the previous track (missing at least time section)")
 			temp["instrument"] = instruments[temp["instrument"]]
