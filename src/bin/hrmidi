@@ -784,7 +784,7 @@ def parse_hrmidi() -> list:
 					if octave: print_error(f"invalid octave number at line {number}")
 					if clef not in clefs.keys(): print_error(f"invalid clef name at line {number}")
 					clef = clefs[clef]
-				if -5 > clef > 5: print_error(f"invalid clef at line {number} (limit is from -5 to 5)")
+				if not -5 <= clef <= 5: print_error(f"invalid clef at line {number} (limit is from -5 to 5, or -1 to 9 in octaves)")
 			temp = { 'instrument': instrument, 'clef': clef, "modifier": 1, "velocity": vel,
 				"keys": [], "times": [], "shift": [], "vels": [], "vibs": [], "chords": [], "subtrack": []}
 			continue
@@ -793,7 +793,7 @@ def parse_hrmidi() -> list:
 			if step_n: print_error(f"duplicate and/or invalid keys section at line {number}")
 			items = re.split(r'[;\s]+', line)
 			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
-			instrument: str = items[0].replace('n_', '')
+			instrument: str = items[0][2:]
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			if instruments[instrument] == 129:
 				if '(' in line or ')' in line: print_error(f"percurssion cannot have (), found at line {number}")
@@ -863,7 +863,7 @@ def parse_hrmidi() -> list:
 				temp["chords"].append(chord)
 				c = chords[chord][-1] # The highest shift
 				for key, shift in zip(temp["keys"][index], temp["shift"][index]):
-					if ( (key + ((temp["clef"] + 5) * 12) + (shift * 12)) + c ) > 127:
+					if ( (key + ((temp["clef"] + 5) * 12) + (shift * 12)) + c ) > 128:
 						print_error(f'chord "{chord}" at line {number} causes the note {key} to be too high')
 			step_a = True
 			continue
