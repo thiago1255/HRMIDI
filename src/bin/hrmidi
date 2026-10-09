@@ -621,6 +621,11 @@ def parse_hrmidi() -> list:
 						output = a // b
 				except:
 					output = s
+		try:
+			if output < 0:
+				output = s
+		except:
+			pass
 		return output
 
 	def get_term(lines: dict, term_name: str, optional: bool = False) -> str | None:
@@ -998,7 +1003,7 @@ def make_midi() -> bytes:
 	result += b"MThd"													# Header begin
 	result += (6).to_bytes(4, 'big')									# Header standard size
 	result += (1).to_bytes(2, 'big')									# Midi format, there is 0, 1 and 2
-	result += (sum(len(x) for x in source[1:]) + 1).to_bytes(2, 'big')	# How many track chunks
+	result += (sum(len(x) - 1 for x in source[1:]) + 1).to_bytes(2, 'big')	# How many track chunks
 	result += (TICKS * BEAT_BASE).to_bytes(2, 'big')					# Some timing stuff
 
 	result += mtrk([
@@ -1011,8 +1016,8 @@ def make_midi() -> bytes:
 	actual_offset:int = 0; next_offset:int = 0
 	for page in source[1:]:
 		channels: dict = {}
-		actual_offset += next_offset
-		next_offset = page[0]
+		actual_offset += next_offset + int(page[0] * TICKS)
+		next_offset = 0
 		for track in page[1:]:
 			tmp_offset: int = 0
 			instrument: int = track['instrument'] - 1
@@ -1136,7 +1141,7 @@ def make_hr() -> str:
 		if first_page:
 			first_page = False
 		else:
-			result += "PAG {page[0] / BEAT_BASE}\n\n"
+			result += f"PAG {page[0] / BEAT_BASE}\n\n"
 		for track in page[1:]:
 			instrument: str = instruments_dict[track["instrument"]].upper()
 			modifier = track['modifier']
