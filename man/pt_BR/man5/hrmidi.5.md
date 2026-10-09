@@ -87,6 +87,15 @@ As trilhas devem ter: exatamente 1 `C_`; mínimo de 1 `N_` seguido de 1 `T_`, ou
 	
 	Para adicionar vibrato pode-se usar `~`, até 4 vezes, mapeando o *Aftertouch* do midi para 31, 63, 95 ou 127 (máximo). Em futuras versões isso pode-se tornar configuravel.
 
+**A** *acordes* [Opcional]
+:	Modo de calcular acordes automaticamente para nota(s) escritas em uma **N_** anterior.
+
+	Por hora há as tríades: `ma` (maior), `mn` (menor), `di` (diminuta), `au` (aumentada), `o` (oitavas: nota +nota ++nota); para não gerar acordes usa-se `_`.
+	
+	As notas geradas pelo acorde herdam propriedades das outras, ex: `(Do +Do~) Si~` com `ma _` gera equivalente a `(Do Mi Sol +Do~ +Mi~ +Sol~) Si~`.
+	
+	Esta linha deve ser escrita entre notas e tempos, deve ter o mesmo número de items que elas.
+
 **T** *tempos* (Obrigatório)
 :	Define o tempo de cada nota ou pausa da linha das notas - quantas batidas ela vale. Deve ter a mesma quantidade de itens que a linha de notas, que deve estar acima desta.
 

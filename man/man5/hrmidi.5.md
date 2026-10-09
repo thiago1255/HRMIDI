@@ -87,6 +87,15 @@ The tracks must have: exactly 1 `C_`; minimum of 1 `N_` followed by 1 `T_`, or 1
 	
 	To add vibrato, `~` can be used till 4 times, maping midi's *Aftertouch* to 31, 63, 95, or 127 (maximum). In futures versions this may be configurable.
 
+**A** *chords* [Optional]
+:	Way to calculate automatically chords for key(s) written on a previous **N_**.
+
+	For now, there is the triads: `ma` (major), `mn` (minor), `di` (diminished), `au` (augmented), `o` (octaves: note +note ++note); to not generate chords `_` is used.
+	
+	The generated keys will follow the properties, example: `(Do +Do~) Si~` with `ma _` generates the equivalent to `(Do Mi Sol +Do~ +Mi~ +Sol~) Si~`.
+	
+	This line must be written between notes and times, and must have the same ammount of arguments.
+
 **T** *times* (Mandatory)
 :	Sets the duration of each key or break from the keys line - how many beats. Must have the same amount of items as the keys line, which must be above this.
 

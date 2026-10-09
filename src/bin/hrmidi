@@ -563,8 +563,8 @@ VIBRATO: dict = {
 }
 
 chords: dict = { # The smaller number first, the bigger number at end, otherwise breaks
-	,'ma': (0, 4, 7)
-	,'mi': (0, 3, 7)
+	'ma': (0, 4, 7)
+	,'mn': (0, 3, 7)
 	,'di': (0, 3, 6)
 	,'au': (0, 4, 8)
 	,'o': (0, 12, 24)
@@ -688,7 +688,7 @@ def parse_hrmidi() -> list:
 			if key == 13: # Si♯
 				key = 1
 				shift += 1
-			if not 1 <= (key + ((temp["clef"] + 5) * 12) + (shift * 12)) <= 127: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
+			if not 1 <= (key + ((temp["clef"] + 5) * 12) + (shift * 12)) <= 128: print_error(f"key '{k}' at line {number} is too high or too low") # Check make_midi() to more info on this math
 			if key != 0:
 				temp_keys.append(key)
 				temp_shift.append(shift)
@@ -858,13 +858,13 @@ def parse_hrmidi() -> list:
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
 			if instruments[instrument] == 129: print_error(f"chords cannot be added to percussion, at line {number}")
 			if len(temp['keys']) != (len(items) - 1): print_error(f"line {number} dont have the same ammount of items as the key line above")
-			for chord, index in enumerate(items[1:]):
+			for index, chord in enumerate(items[1:]):
 				if chord not in chords.keys(): print_error(f"invalid key '{chord}' at line {number}")				
 				temp["chords"].append(chord)
 				c = chords[chord][-1] # The highest shift
 				for key, shift in zip(temp["keys"][index], temp["shift"][index]):
 					if ( (key + ((temp["clef"] + 5) * 12) + (shift * 12)) + c ) > 127:
-						print_error(f"chord "{chord}" at line {number} causes the note {key} to be too high")
+						print_error(f'chord "{chord}" at line {number} causes the note {key} to be too high')
 			step_a = True
 			continue
 		if line.startswith("t_"):
@@ -1059,18 +1059,17 @@ def make_midi() -> bytes:
 			else:
 				if not track['chords']:
 					track['chords'] = [(0,) for _ in track['keys']]
+				else:
+					track['chords'] = [chords[c] for c in track['chords']]
 				for k, s, c, t, v, V in zip(track['keys'], track['shift'], track['chords'], track['times'], track['vels'], track['vibs']):
 					t = int(t * TICKS / track['modifier'])
 					tmp_offset += t
 					if k == [0]:
 						delay += t
 					else:
+						k = [kk + chord for kk in k for chord in c]
+						s, v, V = ([repeat for repeat in prop for _ in range(len(c))] for prop in (s,v,V))
 						real_keys: list = []
-						for kk in k:
-							for chord in c:
-								real_keys.append(kk + chord)
-						k = real_keys
-						real_keys = []
 						for kk, ss, vv, vi, zd in zip(k, s, v, V, range(len(k))):
 							kk -= 1 # In midi they start at 0, not 1
 							kk += ((track['clef'] + 5) * 12) # Sets the clef
