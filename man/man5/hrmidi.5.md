@@ -43,6 +43,8 @@ Lines that sets global settings for the entire file, can be placed anywhere on t
 **PAGE** or **PAG** [Optional]
 :	Play all the tracks inside before start the tracks of the next page (Tracks at the beggining of the document will belong to the first page, withowt using the term).
 
+	Its possible to write a time at the side, to put a delay before play the tracks on the page.
+
 **DODECA** [Optional]
 :	Enables the dodecaphonic mode for tracks below it, inside the page.
 

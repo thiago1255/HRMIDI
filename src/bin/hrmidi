@@ -603,7 +603,7 @@ def parse_hrmidi() -> list:
 					output = s
 		return output
 
-	def get_tempo(s: int) -> int | float | str:
+	def get_tempo(s: str) -> int | float | str:
 		try:
 			output = int(s)
 			output *= BEAT_BASE
@@ -727,7 +727,7 @@ def parse_hrmidi() -> list:
 	else:
 		print_warning('no version specified on file')
 	
-	source: list = [bpm]; page: list = []
+	source: list = [bpm]; page: list = [0]
 	detected_lang: bool = False; detected_bpm: bool = False; detected_ver: bool = False; detected_dodeca: bool = False
 	step_c: bool = False; step_n: bool = False; step_a: bool = False; step_t: bool = False; step_m: bool = False; step_v: bool = False
 	instruments_used: set = set(); vel = 63
@@ -920,11 +920,11 @@ def parse_hrmidi() -> list:
 			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []; temp["vibs"] = []; temp["chords"] = []
 			step_t = True # This is important to see if a track is complete
 			continue
+		items = re.split(r'[;\s]+', line)
+		if not items[-1]: items.pop()
 		if line.startswith("v_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
 			if step_v: print_error(f"duplicate and/or invalid track velocity at line {number}")
-			items = re.split(r'[;\s]+', line)
-			if not items[-1]: items.pop()
 			if len(items) != 2: print_error(f"invalid arguments number at line {number} (must be two)")
 			instrument: str = items[0].replace('v_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
@@ -937,8 +937,6 @@ def parse_hrmidi() -> list:
 		if line.startswith("m_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
 			if step_m: print_error(f"duplicate and/or invalid modifier at line {number}")
-			items = re.split(r'[;\s]+', line)
-			if not items[-1]: items.pop()
 			if len(items) != 2: print_error(f"invalid arguments number at line {number} (must be two)")
 			instrument: str = items[0].replace('m_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
@@ -948,7 +946,10 @@ def parse_hrmidi() -> list:
 			temp["modifier"] = modifier
 			step_m = True
 			continue
-		if line.strip() in page_names:
+		if items[0] in page_names:
+			if len(items) > 2: print_error(f"page at line {number}, have too many arguments (must be 1 or 2)")
+			delay = get_tempo(items[1])
+			if isinstance(delay, str): print_error(f"page delay at line {number} must be a valid number or fraction")
 			if not step_c: print_error(f"new page started at line {number}, but previous didnt had any track")
 			if not step_t: print_error(f"new page started at line {number} without finish the previous track (missing at least time section)")
 			temp["instrument"] = instruments[temp["instrument"]]
@@ -958,7 +959,7 @@ def parse_hrmidi() -> list:
 					"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3], "vibs": subtrack[4], "chords": subtrack[5]
 				})
 			source.append(page)
-			temp = {}; page = []
+			temp = {}; page = [delay]
 			step_c, step_n, step_t, step_a, step_m, step_v, detected_dodeca = False, False, False, False, False, False, False
 			continue
 		print_error(f'unknow instruction at line {number}')
@@ -1011,8 +1012,8 @@ def make_midi() -> bytes:
 	for page in source[1:]:
 		channels: dict = {}
 		actual_offset += next_offset
-		next_offset = 0
-		for track in page:
+		next_offset = page[0]
+		for track in page[1:]:
 			tmp_offset: int = 0
 			instrument: int = track['instrument'] - 1
 			
@@ -1135,8 +1136,8 @@ def make_hr() -> str:
 		if first_page:
 			first_page = False
 		else:
-			result += "PAG\n\n"
-		for track in page:
+			result += "PAG {page[0] / BEAT_BASE}\n\n"
+		for track in page[1:]:
 			instrument: str = instruments_dict[track["instrument"]].upper()
 			modifier = track['modifier']
 			result += f"C_{instrument} {clefs_dict[track['clef']]}\n"

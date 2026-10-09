@@ -43,6 +43,8 @@ Linhas que definem elementos universais para todo o arquivo, podem ser escritos 
 **PAGINA** ou **PAG** [Opcional]
 :	Toca todas as trilhas dentro antes de começar as trilhas da próxima página. (As trilhas escritas no começo do documento pertencerão a primeira página sem usar o termo)
 
+	Pode-se escrever um tempo ao lado, para colocar um delay antes de tocar as trilhas da página.
+
 **DODECA** [Opcional]
 :	Ativa o modo dodecafonico para trilhas abaixo, dentro da página.
 
