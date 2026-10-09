@@ -672,7 +672,7 @@ def parse_hrmidi() -> list:
 			k: str = f"{key}"
 			shift: int = (key.count('+') - key.count('-'))
 			vib: int = key.count('~')
-			if vib > 3: print_error(f"too many vibrato ~ at line {number}, '{k}' must be 0-4")
+			if vib > 4: print_error(f"too many vibrato ~ at line {number}, '{k}' must be 0-4")
 			vib = VIBRATO[vib]
 			key = key.replace('-', '').replace('+', '').replace('~', '')
 			# The part above must stay there, to clean +-~ before parse velocity
@@ -1260,7 +1260,7 @@ if __name__ == "__main__":
 			file = f.read()
 	except FileNotFoundError:
 		print_error(f"file '{args.file}' not found.")
-	if args.replace_file:
+	if args.r:
 		try:
 			with open(args.r, 'r') as f:
 				replace_file = json.load(f)
@@ -1278,6 +1278,8 @@ if __name__ == "__main__":
 				print_error('the sub-arrays must have 2 items')
 			if not isinstance(replace[0], str):
 				print_error(f'the first item of this subarray is not text: {replace[0]}')
+			if not replace[0]:
+				print_error(f'the first item of this subarray is empty: {replace}')
 			if not isinstance(replace[1], str):
 				print_error(f'the second item of this subarray is not text: {replace[1]}')
 			file = file.replace(replace[0], replace[1])
