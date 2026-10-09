@@ -1,0 +1,27 @@
+pkgname=hrmidi
+pkgver=4
+pkgrel=1
+pkgdesc='Human Readable MIDI, to easily write music to be converted to .mid files.'
+arch=('any')
+url='https://gitlab.com/thiago1255/hrmidi'
+license=('Unlicense')
+depends=('python')
+makedepends=('pandoc-cli')
+
+build() {
+	cd "$startdir/.."
+	pandoc man/man1/hrmidi.1.md -s -t man -o "$srcdir/hrmidi.1"
+	pandoc man/man5/hrmidi.5.md -s -t man -o "$srcdir/hrmidi.5"
+	pandoc man/pt_BR/man1/hrmidi.1.md -s -t man -o "$srcdir/hrmidi.pt_BR.1"
+	pandoc man/pt_BR/man5/hrmidi.5.md -s -t man -o "$srcdir/hrmidi.pt_BR.5"
+}
+
+package() {
+	cd "$startdir/.."
+	install -Dm755 src/bin/hrmidi -t "$pkgdir/usr/bin"
+	install -Dm644 LICENSE -t "$pkgdir/usr/share/licenses/$pkgname/"
+	install -Dm644 "$srcdir/hrmidi.1" "$pkgdir/usr/share/man/man1/hrmidi.1"
+	install -Dm644 "$srcdir/hrmidi.5" "$pkgdir/usr/share/man/man5/hrmidi.1"
+	install -Dm644 "$srcdir/hrmidi.pt_BR.1" "$pkgdir/usr/share/man/pt_BR/man1/hrmidi.1"
+	install -Dm644 "$srcdir/hrmidi.pt_BR.5" "$pkgdir/usr/share/man/pt_BR/man5/hrmidi.5"
+}

@@ -38,9 +38,10 @@ There is no need to install or compile, you can simply run the script `src/bin/h
 
 In order to install the *man pages*, run the script `convert-man-pages.sh` before, *pandoc* need to be installed.
 
+This repository does however have a PKGBUILD for arch based distros.
+
 Check the [manual](man/man1/hrmidi.1.md) for more details.
 
 # Todo:
 ### Version 4:
-- pkg generator (to install on arch based distros)
 - text replace (probably argument on compiler)
