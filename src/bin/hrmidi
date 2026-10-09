@@ -562,6 +562,15 @@ VIBRATO: dict = {
 	,4: 127
 }
 
+chords: dict = { # The smaller number first, the bigger number at end, otherwise breaks
+	,'ma': (0, 4, 7)
+	,'mi': (0, 3, 7)
+	,'di': (0, 3, 6)
+	,'au': (0, 4, 8)
+	,'o': (0, 12, 24)
+	,'_': (0,)
+}
+
 page_names: tuple[str, ...] = ('pag', 'page', 'pagina')
 
 BEAT_BASE:int = 30 # The ammount of beats must be multiplied by this
@@ -720,7 +729,7 @@ def parse_hrmidi() -> list:
 	
 	source: list = [bpm]; page: list = []
 	detected_lang: bool = False; detected_bpm: bool = False; detected_ver: bool = False; detected_dodeca: bool = False
-	step_c: bool = False; step_n: bool = False; step_t: bool = False; step_m: bool = False; step_v: bool = False
+	step_c: bool = False; step_n: bool = False; step_a: bool = False; step_t: bool = False; step_m: bool = False; step_v: bool = False
 	instruments_used: set = set(); vel = 63
 	temp: dict = {}
 	for number, line in lines.items():
@@ -752,9 +761,9 @@ def parse_hrmidi() -> list:
 				for subtrack in temp['subtrack']:
 					page.append({
 						'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
-						"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3], "vibs": subtrack[4]
+						"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3], "vibs": subtrack[4], "chords": subtrack[5]
 					})
-				step_c, step_n, step_t, step_m, step_v = False, False, False, False, False
+				step_c, step_n, step_a, step_t, step_m, step_v = False, False, False, False, False, False
 			step_c = True
 			items = re.split(r'[;\s]+', line)
 			if not items[-1]: items.pop()
@@ -770,14 +779,14 @@ def parse_hrmidi() -> list:
 				clef = str_to_number(items[1])
 				octave = line.startswith("o_")
 				if isinstance(clef, int):
-					if octave: clef += 4
+					if octave: clef -= 4
 				else:
 					if octave: print_error(f"invalid octave number at line {number}")
 					if clef not in clefs.keys(): print_error(f"invalid clef name at line {number}")
 					clef = clefs[clef]
 				if -5 > clef > 5: print_error(f"invalid clef at line {number} (limit is from -5 to 5)")
 			temp = { 'instrument': instrument, 'clef': clef, "modifier": 1, "velocity": vel,
-				"keys": [], "times": [], "shift": [], "vels": [], "vibs": [], "subtrack": []}
+				"keys": [], "times": [], "shift": [], "vels": [], "vibs": [], "chords": [], "subtrack": []}
 			continue
 		if line.startswith("n_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
@@ -838,6 +847,26 @@ def parse_hrmidi() -> list:
 			step_n = True
 			step_t = False # Added so many T and N can be written at the same track
 			continue
+		if line.startswith("a_"):
+			if not step_c: print_error(f"line {number} does not have clef declaration above")
+			if not step_n: print_error(f"chords section at line {number} requires keys section above (time must be below")
+			if step_a: print_error(f"duplicate and/or invalid chords section at line {number}")
+			items = re.split(r'[;\s]+', line)
+			if not items[-1]: items.pop()
+			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
+			instrument: str = items[0].replace('a_', '')
+			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
+			if instruments[instrument] == 129: print_error(f"chords cannot be added to percussion, at line {number}")
+			if len(temp['keys']) != (len(items) - 1): print_error(f"line {number} dont have the same ammount of items as the key line above")
+			for chord, index in enumerate(items[1:]):
+				if chord not in chords.keys(): print_error(f"invalid key '{chord}' at line {number}")				
+				temp["chords"].append(chord)
+				c = chords[chord][-1] # The highest shift
+				for key, shift in zip(temp["keys"][index], temp["shift"][index]):
+					if ( (key + ((temp["clef"] + 5) * 12) + (shift * 12)) + c ) > 127:
+						print_error(f"chord "{chord}" at line {number} causes the note {key} to be too high")
+			step_a = True
+			continue
 		if line.startswith("t_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
 			if not step_n: print_error(f"time section at line {number} requires keys section above")
@@ -846,12 +875,13 @@ def parse_hrmidi() -> list:
 			if len(items) < 2: print_error(f"invalid arguments number at line {number} (must be at least two)")
 			instrument: str = items[0].replace('t_', '')
 			if temp["instrument"] != instrument: print_error(f"instrument at line {number} is not the same declared on clef")
+			if len(temp['keys']) != (len(items) - 1): print_error(f"line {number} dont have the same ammount of items as the key line above")
 			temp["times"] = parse_times(number, items[1:])
-			if len(temp['keys']) != len(temp['times']): print_error(f"line {number} dont have the same ammount of items as the key line above")
-			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift'], temp["vels"], temp["vibs"]))
-			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []; temp["vibs"] = []
+			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift'], temp["vels"], temp["vibs"], temp["chords"]))
+			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []; temp["vibs"] = []; temp["chords"] = []
 			step_t = True # This is important to see if a track is complete
 			step_n = False # Added so many T and N can be written at the same track
+			step_a = False
 			continue
 		if line.startswith("nt_"):
 			if not step_c: print_error(f"line {number} does not have clef declaration above")
@@ -886,8 +916,8 @@ def parse_hrmidi() -> list:
 			if p:
 				temp["keys"], temp["vels"] = parse_percussion(number, notes)
 				temp["vibs"] = [0] * len(temp["keys"])
-			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift'], temp["vels"], temp["vibs"]))
-			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []; temp["vibs"] = []
+			temp['subtrack'].append((temp['keys'], temp['times'], temp['shift'], temp["vels"], temp["vibs"], temp["chords"]))
+			temp["keys"] = []; temp['times'] = []; temp['shift'] = []; temp["vels"] = []; temp["vibs"] = []; temp["chords"] = []
 			step_t = True # This is important to see if a track is complete
 			continue
 		if line.startswith("v_"):
@@ -925,11 +955,11 @@ def parse_hrmidi() -> list:
 			for subtrack in temp['subtrack']:
 				page.append({
 					'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
-					"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3], "vibs": subtrack[4]
+					"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3], "vibs": subtrack[4], "chords": subtrack[5]
 				})
 			source.append(page)
 			temp = {}; page = []
-			step_c, step_n, step_t, step_m, step_v, detected_dodeca = False, False, False, False, False, False
+			step_c, step_n, step_t, step_a, step_m, step_v, detected_dodeca = False, False, False, False, False, False, False
 			continue
 		print_error(f'unknow instruction at line {number}')
 	
@@ -940,7 +970,7 @@ def parse_hrmidi() -> list:
 	for subtrack in temp['subtrack']:
 		page.append({
 			'instrument': temp['instrument'], 'clef': temp['clef'], 'modifier': temp['modifier'], 'velocity': temp['velocity'],
-			"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3], "vibs": subtrack[4]
+			"keys": subtrack[0], "times": subtrack[1], "shift": subtrack[2], "vels": subtrack[3], "vibs": subtrack[4], "chords": subtrack[5]
 		})
 	source.append(page)
 	return source
@@ -1027,13 +1057,20 @@ def make_midi() -> bytes:
 						]
 						delay = 0
 			else:
-				for k, s, t, v, V in zip(track['keys'], track['shift'], track['times'], track['vels'], track['vibs']):
+				if not track['chords']:
+					track['chords'] = [(0,) for _ in track['keys']]
+				for k, s, c, t, v, V in zip(track['keys'], track['shift'], track['chords'], track['times'], track['vels'], track['vibs']):
 					t = int(t * TICKS / track['modifier'])
 					tmp_offset += t
 					if k == [0]:
 						delay += t
 					else:
 						real_keys: list = []
+						for kk in k:
+							for chord in c:
+								real_keys.append(kk + chord)
+						k = real_keys
+						real_keys = []
 						for kk, ss, vv, vi, zd in zip(k, s, v, V, range(len(k))):
 							kk -= 1 # In midi they start at 0, not 1
 							kk += ((track['clef'] + 5) * 12) # Sets the clef
@@ -1119,6 +1156,7 @@ def make_hr() -> str:
 					result = result[:-2]
 				else:
 					if not track['shift']: track['shift'] = [0] * len(track['keys'])
+					if track['chords']: print_error('cannot translate chords to single mode "NT_": not implemented')
 					for kk, vv, ss, vibs, time in zip(track['keys'], track['vels'], track['shift'], track['vibs'], track['times']):
 						for key, vel, shift, vib in zip(kk, vv, ss, vibs):
 							result += " "
@@ -1170,6 +1208,11 @@ def make_hr() -> str:
 							result += (OTARBIV[vib] * "~")
 							result += ';'
 						result = result[:-1] + ")	"
+				if track['chords']:
+					result += f"\nA_{instrument} "
+					for chord in track['chords']:
+						result += chord
+						result += " 	"
 				result += f"\nT_{instrument} "
 				for time in track['times']:
 					if convert_modifier:
