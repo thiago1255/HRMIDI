@@ -1,4 +1,4 @@
-% hrmidi(5) v3 | Manual of the hrmidi language
+% hrmidi(5) v4 | Manual of the hrmidi language
 % thiago1255
 % 2026
 

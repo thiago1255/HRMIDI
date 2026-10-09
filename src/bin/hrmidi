@@ -8,7 +8,7 @@ import json
 from argparse import ArgumentParser
 
 # - - - - - - - constants
-version: str = "3"
+version: str = "4"
 languages: tuple[str, ...] = ('pt', 'en', 'midi')
 keys = {
 	0:		0
@@ -1262,17 +1262,17 @@ if __name__ == "__main__":
 		print_error(f"file '{args.file}' not found.")
 	if args.replace_file:
 		try:
-			with open(args.replace_file, 'r') as f:
+			with open(args.r, 'r') as f:
 				replace_file = json.load(f)
 		except FileNotFoundError:
-			print_error(f"file '{args.replace_file}' not found.")
+			print_error(f"file '{args.r}' not found.")
 		except json.decoder.JSONDecodeError:
-			print_error(f"file '{args.replace_file}' have invalid json.")
+			print_error(f"file '{args.r}' have invalid json.")
 
 		if not isinstance(replace_file, list):
 			print_error('replace file json must be an array')
 		for replace in replace_file:
-			if not isinstance(replace_file, list):
+			if not isinstance(replace, list):
 				print_error('the items of replace file must be arrays')
 			if len(replace) != 2:
 				print_error('the sub-arrays must have 2 items')
